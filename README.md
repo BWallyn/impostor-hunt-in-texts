@@ -1,4 +1,8 @@
-# impostor-hunt-in-texts
+# Impostor hunt in texts
+
+## Summary 🚀
+
+The main task of this competition is to detect fake texts in a given dataset. Each data sample contains two texts - one real and one fake. The data used in this Challenge come from The Messenger journal. Importantly, both texts in each sample - real (optimal for the recipient, as close as possible to the hidden original text) and fake (more or much more distant from the hidden original text) - have been significantly modified using LLMs.
 
 [![Powered by Kedro](https://img.shields.io/badge/powered_by-kedro-ffc900?logo=kedro)](https://kedro.org)
 
