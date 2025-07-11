@@ -7,7 +7,13 @@ requires-python = ">=3.9"
 name = "impostor_hunt_in_texts"
 readme = "README.md"
 dynamic = [ "version",]
-dependencies = [ "ipython>=8.10", "jupyterlab>=3.0", "notebook", "kedro~=0.19.12",]
+dependencies = [
+ "ipython>=8.10",
+ "jupyterlab>=3.0",
+ "notebook",
+ "kedro~=0.19.12",
+ "catboost>=1.2.8",
+]
 
 [project.scripts]
 impostor-hunt-in-texts = "impostor_hunt_in_texts.__main__:main"
