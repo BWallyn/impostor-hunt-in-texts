@@ -32,8 +32,35 @@ source_dir = "src"
 [tool.ruff]
 line-length = 88
 show-fixes = true
-select = [ "F", "W", "E", "I", "UP", "PL", "T201",]
-ignore = [ "E501",]
+lint.select = [
+    "B",    # Bugbear
+    "C4",   # Comprehensions
+    "C90",  # mccabe
+    "D",    # Docstrings
+    "E",    # pycodestyle error
+    "W",    # pycodestyle warning
+    "F",    # flake8
+    "S",    # bandit
+    "N",    # pep8-naming
+    "RUF",  # ruff
+    "I",    # isort
+    "PD",   # pandas
+    "UP",   # pyupgrade
+    "PL",   # pylint
+    "T201", # print
+]
+lint.ignore = [
+    "E501", # line too long
+    "D100", # missing docstring
+    "D104", # missing docstring in public package
+    "D205", # blank line between summary and description
+    "D400", # first line should end with a period, question mark or exclamation point
+    "D404", # first word of the docstring should not be "This"
+    "D407", # Missing dashed underline after section
+    "D413", # Missing blank line after section
+    "D415", # first line should end with a period, question mark or exclamation point
+    "N806", # Variable should be lowercase
+]
 
 [project.entry-points."kedro.hooks"]
 
