@@ -81,3 +81,6 @@ attr = "impostor_hunt_in_texts.__version__"
 [tool.setuptools.packages.find]
 where = [ "src",]
 namespaces = false
+
+[tool.kedro_telemetry]
+project_id = "9b6e58a9066f41abb12b9ef61001798a"
