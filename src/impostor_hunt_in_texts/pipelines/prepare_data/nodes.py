@@ -9,12 +9,14 @@ generated using Kedro 0.19.14
 import os
 import pandas as pd
 
+from datasets import Dataset
+
 
 # ===================
 # ==== FUNCTIONS ====
 # ===================
 
-def generate_dataset_train(df: pd.DataFrame, path_data: str):
+def _generate_dataset_train(df: pd.DataFrame, path_data: str):
     """Generate a dataset from the DataFrame and text files in the specified directory.
     
     Args:
@@ -43,7 +45,7 @@ def generate_dataset_train(df: pd.DataFrame, path_data: str):
         }
 
 
-def generate_dataset_test(path_data: str):
+def _generate_dataset_test(path_data: str):
     """Generate a dataset from the text files in the specified directory.
     
     Args:
@@ -76,3 +78,28 @@ def generate_dataset_test(path_data: str):
             "text1": text1,
             "text2": text2
         }
+
+
+def create_dataset_train(df: pd.DataFrame, path_data: str) -> Dataset:
+    """Create a Dataset for training from the DataFrame and text files.
+    
+    Args:
+        df (pd.DataFrame): DataFrame containing 'id' and 'real_text_id' columns.
+        path_data (str): The path to the directory containing the text files.
+    
+    Returns:
+        (Dataset): A Dataset object containing the training data.
+    """
+    return Dataset.from_generator(lambda: _generate_dataset_train(df, path_data))
+
+
+def create_dataset_test(path_data: str) -> Dataset:
+    """Create a Dataset for test from text files.
+    
+    Args:
+        path_data (str): The path to the directory containing the text files.
+    
+    Returns:
+        (Dataset): A Dataset object containing the test data.
+    """
+    return Dataset.from_generator(lambda: _generate_dataset_test(path_data))
