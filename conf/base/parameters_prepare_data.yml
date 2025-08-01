@@ -3,3 +3,6 @@
 #
 # Documentation for this file format can be found in "Parameters"
 # Link: https://docs.kedro.org/en/0.19.14/configuration/parameters.html
+
+prepare_data.path_data_train: "data/01_raw/train"
+prepare_data.path_data_test: "data/01_raw/test"

@@ -15,13 +15,13 @@ def create_pipeline(**kwargs) -> Pipeline:
         pipe=[
             node(
                 func=create_dataset_train,
-                inputs=["df_train", "params:path_data"],
+                inputs=["df_train", "params:path_data_train"],
                 outputs="dataset_train",
                 name="Create_dataset_train",
             ),
             node(
                 func=create_dataset_test,
-                inputs="params:path_data",
+                inputs="params:path_data_test",
                 outputs="dataset_test",
                 name="Create_dataset_test",
             ),
