@@ -1,7 +1,4 @@
-"""
-This is a boilerplate pipeline 'prepare_data'
-generated using Kedro 0.19.14
-"""
+"""This is a boilerplate pipeline 'prepare_data' generated using Kedro 0.19.14"""
 
 from kedro.pipeline import node, Pipeline, pipeline  # noqa
 from impostor_hunt_in_texts.pipelines.prepare_data.nodes import (
@@ -11,6 +8,7 @@ from impostor_hunt_in_texts.pipelines.prepare_data.nodes import (
 
 
 def create_pipeline(**kwargs) -> Pipeline:
+    """Create the prepare data pipeline."""
     return pipeline(
         pipe=[
             node(
