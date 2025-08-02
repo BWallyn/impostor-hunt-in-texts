@@ -1,17 +1,13 @@
-"""
-This is a boilerplate pipeline 'prepare_data'
-generated using Kedro 0.19.14
-"""
+"""This is a boilerplate pipeline 'prepare_data' generated using Kedro 0.19.14"""
 # =================
 # ==== IMPORTS ====
 # =================
 
 import os
 import re
+
 import pandas as pd
-
 from datasets import Dataset
-
 
 # ===================
 # ==== FUNCTIONS ====
