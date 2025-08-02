@@ -63,6 +63,7 @@ lint.ignore = [
     "D413", # Missing blank line after section
     "D415", # first line should end with a period, question mark or exclamation point
     "N806", # Variable should be lowercase
+    "PD901",# Avoid using "df" as a variable name
 ]
 
 [project.entry-points."kedro.hooks"]
