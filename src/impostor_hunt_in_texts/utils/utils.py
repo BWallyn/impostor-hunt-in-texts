@@ -2,7 +2,7 @@
 # ==== IMPORTS ====
 # =================
 
-from datasets import DatasetDict
+from datasets import Dataset, DatasetDict
 
 # ===================
 # ==== FUNCTIONS ====
@@ -21,3 +21,16 @@ def save_hf_datasetdict(dataset_dict: DatasetDict, path_to_save: str) -> dict[st
     """
     dataset_dict.save_to_disk(path_to_save)
     return {key: f"{path_to_save}/{key}" for key in dataset_dict.keys()}
+
+
+def split_dataset_dict(dataset_dict: DatasetDict) -> tuple[Dataset, Dataset]:
+    """
+    Split the DatasetDict into train and test datasets.
+
+    Args:
+        dataset_dict (DatasetDict): The DatasetDict containing 'train' and 'test' datasets.
+
+    Returns:
+        (tuple[Dataset, Dataaset]): A tuple containing the train and test datasets.
+    """
+    return dataset_dict["train"], dataset_dict["test"]
