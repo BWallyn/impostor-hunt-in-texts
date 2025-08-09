@@ -56,7 +56,9 @@ lint.ignore = [
     "E501", # line too long
     "D100", # missing docstring
     "D104", # missing docstring in public package
+    "D203", # One blank line before class docstring
     "D205", # blank line between summary and description
+    "D212", # Multi-line docstring summary should start at the second line
     "D400", # first line should end with a period, question mark or exclamation point
     "D404", # first word of the docstring should not be "This"
     "D407", # Missing dashed underline after section
