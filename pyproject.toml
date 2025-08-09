@@ -11,7 +11,7 @@ dependencies = [
  "ipython>=8.10",
  "jupyterlab>=3.0",
  "notebook",
- "kedro~=0.19.12",
+ "kedro>=1.0",
  "catboost>=1.2.8",
  "datasets>=4.0.0",
  "kedro-viz>=11.1.0",
