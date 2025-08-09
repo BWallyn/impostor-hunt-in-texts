@@ -1,0 +1,13 @@
+# This is a boilerplate parameters config generated for pipeline 'feature_engineering'
+# using Kedro 1.0.0.
+#
+# Documentation for this file format can be found in "Parameters"
+# Link: https://docs.kedro.org/en/1.0.0/configuration/parameters.html
+
+# Define the Hugging Face model name to be used for feature extraction
+feature_engineering.hf_model_name: "bert-base-uncased"
+
+# Define the parameters for the feature extraction process
+feature_engineering.max_length: 512
+feature_engineering.stride: 256
+feature_engineering.device: "cpu"
