@@ -6,3 +6,5 @@
 
 prepare_data.path_data_train: "data/01_raw/train"
 prepare_data.path_data_test: "data/01_raw/test"
+
+prepare_data.path_dataset_dict: "data/02_intermediate/dict_datasets"
