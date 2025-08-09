@@ -14,7 +14,8 @@ from datasets import Dataset, DatasetDict
 # ===================
 
 def _generate_dataset_train(df: pd.DataFrame, path_data: str):
-    """Generate a dataset from the DataFrame and text files in the specified directory.
+    """
+    Generate a dataset from the DataFrame and text files in the specified directory.
 
     Args:
         df (pd.DataFrame): DataFrame containing 'id', 'text1', and 'text2' columns.
@@ -43,7 +44,8 @@ def _generate_dataset_train(df: pd.DataFrame, path_data: str):
 
 
 def _generate_dataset_test(path_data: str):
-    """Generate a dataset from the text files in the specified directory.
+    """
+    Generate a dataset from the text files in the specified directory.
 
     Args:
         path_data (str): The path to the directory containing the text files.
@@ -78,7 +80,8 @@ def _generate_dataset_test(path_data: str):
 
 
 def create_dataset_train(df: pd.DataFrame, path_data: str) -> Dataset:
-    """Create a Dataset for training from the DataFrame and text files.
+    """
+    Create a Dataset for training from the DataFrame and text files.
 
     Args:
         df (pd.DataFrame): DataFrame containing 'id' and 'real_text_id' columns.
@@ -91,7 +94,8 @@ def create_dataset_train(df: pd.DataFrame, path_data: str) -> Dataset:
 
 
 def create_dataset_test(path_data: str) -> Dataset:
-    """Create a Dataset for test from text files.
+    """
+    Create a Dataset for test from text files.
 
     Args:
         path_data (str): The path to the directory containing the text files.
@@ -103,7 +107,8 @@ def create_dataset_test(path_data: str) -> Dataset:
 
 
 def create_datasets_dict(dataset_train: Dataset, dataset_test: Dataset) -> DatasetDict:
-    """Create a DatasetDict containing train and test datasets.
+    """
+    Create a DatasetDict containing train and test datasets.
 
     Args:
         dataset_train (Dataset): The train Dataset.
