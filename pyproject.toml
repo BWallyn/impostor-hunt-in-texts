@@ -11,7 +11,7 @@ dependencies = [
  "ipython>=8.10",
  "jupyterlab>=3.0",
  "notebook",
- "kedro~=0.19.12",
+ "kedro>=1.0",
  "catboost>=1.2.8",
  "datasets>=4.0.0",
  "kedro-viz>=11.1.0",
@@ -27,7 +27,7 @@ dev = [ "pytest-cov~=3.0", "pytest-mock>=1.7.1, <2.0", "pytest~=7.2", "ruff~=0.1
 [tool.kedro]
 package_name = "impostor_hunt_in_texts"
 project_name = "impostor-hunt-in-texts"
-kedro_init_version = "0.19.12"
+kedro_init_version = "1.0.0"
 tools = "['Linting', 'Testing', 'Data Structure']"
 example_pipeline = "False"
 source_dir = "src"
