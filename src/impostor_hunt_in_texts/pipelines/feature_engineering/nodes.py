@@ -6,8 +6,11 @@ generated using Kedro 1.0.0
 # ==== IMPORTS ====
 # =================
 
+import numpy as np
 import torch
 import transformers
+from datasets import Dataset
+from tqdm import tqdm
 
 # ===================
 # ==== FUNCTIONS ====
@@ -29,7 +32,7 @@ def load_model_and_tokenizer(model_name: str) -> tuple[transformers.PreTrainedMo
     )
 
 
-def extract_mean_pooling_vector(  # noqa: PLR0913
+def _extract_mean_pooling_vector(  # noqa: PLR0913
     text: str,
     tokenizer : transformers.PreTrainedTokenizer,
     model,
@@ -44,9 +47,9 @@ def extract_mean_pooling_vector(  # noqa: PLR0913
         text (str): The input text to process.
         tokenizer (transformers.PreTrainedTokenizer): The tokenizer to use for encoding the text.
         model (transformers.PreTrainedModel): The model to use for generating embeddings.
-        max_length (int): Maximum length of the input sequence.
-        stride (int): Stride for the sliding window.
-        device (str): Device to run the model on ("cpu" or "cuda").
+        max_length (int): Maximum length of the input sequence. Default is 512.
+        stride (int): Stride for the sliding window. Default is 256.
+        device (str): Device to run the model on ("cpu" or "cuda"). Default is "cpu".
 
     Returns:
         (np.ndarray): The mean pooling vector of the text.
@@ -91,3 +94,45 @@ def extract_mean_pooling_vector(  # noqa: PLR0913
     final_vec = torch.stack(all_mean_vecs).mean(dim=0)
 
     return final_vec.cpu()
+
+
+def extract_features(  # noqa: PLR0913
+    dataset: Dataset,
+    tokenizer: transformers.PreTrainedTokenizer,
+    model: transformers.PreTrainedModel,
+    max_length: int = 512,
+    stride: int = 256,
+    device: str = "cpu",
+) -> tuple[np.ndarray, list]:
+    """
+    Extract interaction-based features from each text pair.
+
+    Args:
+        dataset (Dataset): The dataset containing text pairs.
+        tokenizer (transformers.PreTrainedTokenizer): The tokenizer to use to encode the text.
+        model (transformers.PreTrainedModel): The model to use to generate embeddings.
+        max_length (int): Maximum length of the input sequence. Default is 512.
+        stride (int): Stride for the sliding window. Default is 256.
+        device (str): Device to run the model on ("cpu" or "cuda"). Default is "cpu".
+
+    Returns:
+        features (np.ndarray): Features extracted from the text pairs.
+        ids (list[str]): List of sample IDs.
+    """
+    features = []
+    ids = []
+
+    for row in tqdm(dataset, desc="Extracting features"):
+        vec1 = _extract_mean_pooling_vector(row['text1'], tokenizer, model, max_length, stride, device)
+        vec2 = _extract_mean_pooling_vector(row['text2'], tokenizer, model, max_length, stride, device)
+
+        # Compute interaction vectors
+        diff = vec1 - vec2
+        prod = vec1 * vec2
+
+        # Concatenate all parts
+        final_vec = torch.cat([vec1, vec2, diff, prod])
+        features.append(final_vec.numpy())
+        ids.append(row['id'])
+
+    return np.array(features), ids
