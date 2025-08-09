@@ -10,3 +10,16 @@ df_train:
   filepath: data/01_raw/train.csv
   load_args:
     sep: ","
+
+# dataset_train:
+#   type: kedro_hf_datasets.HFDataset
+#   filepath: data/02_intermediate/dataset_train.HFDataset
+
+
+# dataset_test:
+#   type: kedro_hf_datasets.HFDataset
+#   filepath: data/02_intermediate/dataset_train.HFDataset
+
+dict_metadata_datasets:
+  type: pickle.PickleDataset
+  filepath: data/02_intermediate/dict_metadata_datasets.pkl

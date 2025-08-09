@@ -7,7 +7,7 @@ import os
 import re
 
 import pandas as pd
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
 
 # ===================
 # ==== FUNCTIONS ====
@@ -100,3 +100,19 @@ def create_dataset_test(path_data: str) -> Dataset:
         (Dataset): A Dataset object containing the test data.
     """
     return Dataset.from_generator(lambda: _generate_dataset_test(path_data))
+
+
+def create_datasets_dict(dataset_train: Dataset, dataset_test: Dataset) -> DatasetDict:
+    """Create a DatasetDict containing train and test datasets.
+
+    Args:
+        dataset_train (Dataset): The train Dataset.
+        dataset_test (Dataset): The test Dataset.
+
+    Returns:
+        (DatasetDict): A DatasetDict containing 'train' and 'test' datasets.
+    """
+    return DatasetDict({
+        "train": dataset_train,
+        "test": dataset_test,
+    })
