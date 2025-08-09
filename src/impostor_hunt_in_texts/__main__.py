@@ -1,4 +1,5 @@
-"""impostor-hunt-in-texts file for ensuring the package is executable
+"""
+impostor-hunt-in-texts file for ensuring the package is executable
 as `impostor-hunt-in-texts` and `python -m impostor_hunt_in_texts`
 """
 import sys
@@ -10,6 +11,7 @@ from kedro.framework.project import configure_project
 
 
 def main(*args, **kwargs) -> Any:
+    """Define the main entry point for the impostor-hunt-in-texts package."""
     package_name = Path(__file__).parent.name
     configure_project(package_name)
 

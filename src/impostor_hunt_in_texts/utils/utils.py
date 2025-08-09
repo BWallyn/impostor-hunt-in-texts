@@ -9,7 +9,8 @@ from datasets import DatasetDict
 # ===================
 
 def save_hf_datasetdict(dataset_dict: DatasetDict, path_to_save: str) -> dict[str, str]:
-    """Save the Hugging Face DatasetDict and store all the infos in a dictionary.
+    """
+    Save the Hugging Face DatasetDict and store all the infos in a dictionary.
 
     Args:
         dataset_dict (DatasetDict): The DatasetDict to save.
