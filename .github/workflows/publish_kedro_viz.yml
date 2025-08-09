@@ -28,6 +28,8 @@ on:
 # Job
 jobs:
     deploy:
+        environment:
+            name: github-pages
         runs-on: ubuntu-latest
         strategy:
             matrix:
