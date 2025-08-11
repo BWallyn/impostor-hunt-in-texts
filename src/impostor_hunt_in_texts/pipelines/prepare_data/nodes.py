@@ -9,9 +9,33 @@ import re
 import pandas as pd
 from datasets import Dataset, DatasetDict
 
+from impostor_hunt_in_texts.pipelines.prepare_data.validate_params import ValidateParams
+
 # ===================
 # ==== FUNCTIONS ====
 # ===================
+
+def validate_input_params(path_data_train: str, path_data_test: str, path_dataset_dict: str) -> None:
+    """
+    Validate the input parameters for the prepare_data pipeline.
+
+    Args:
+        path_data_train (str): Path to the training data directory.
+        path_data_test (str): Path to the test data directory.
+        path_dataset_dict (str): Path to the directory for saving the DatasetDict.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If any of the paths do not match the expected pattern.
+    """
+    return ValidateParams(
+        path_data_train=path_data_train,
+        path_data_test=path_data_test,
+        path_dataset_dict=path_dataset_dict,
+    )
+
 
 def _generate_dataset_train(df: pd.DataFrame, path_data: str):
     """
