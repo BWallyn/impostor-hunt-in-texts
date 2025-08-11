@@ -6,6 +6,7 @@ generated using Kedro 1.0.0
 from kedro.pipeline import Node, Pipeline
 
 from impostor_hunt_in_texts.pipelines.feature_engineering.nodes import (
+    convert_features_to_dataframe,
     extract_features,
     load_model_and_tokenizer,
     validate_input_params,
@@ -72,7 +73,26 @@ def create_pipeline(**kwargs) -> Pipeline:
                 outputs=["dataset_test_features", "test_ids"],
                 name="Extract_features_text_test",
             ),
+            Node(
+                func=convert_features_to_dataframe,
+                inputs={
+                    "dataset_features": "dataset_train_features",
+                    "ids": "train_ids",
+                },
+                outputs="df_train_features",
+                name="Convert_features_to_dataframe_train",
+            ),
+            Node(
+                func=convert_features_to_dataframe,
+                inputs={
+                    "dataset_features": "dataset_test_features",
+                    "ids": "test_ids",
+                },
+                outputs="df_test_features",
+                name="Convert_features_to_dataframe_test",
+            ),
         ],
         namespace="feature_engineering",
         inputs="dict_metadata_datasets",
+        outputs=["df_train_features", "df_test_features"],
     )
