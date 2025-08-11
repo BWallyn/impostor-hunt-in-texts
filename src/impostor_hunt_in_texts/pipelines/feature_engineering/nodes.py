@@ -12,9 +12,28 @@ import transformers
 from datasets import Dataset
 from tqdm import tqdm
 
+from impostor_hunt_in_texts.pipelines.feature_engineering.validate_params import (
+    ValidateParams,
+)
+
 # ===================
 # ==== FUNCTIONS ====
 # ===================
+
+def validate_input_params(
+    hf_model_name: str,
+    max_length: int,
+    stride: int,
+    device: str,
+) -> None:
+    """Validate the input parameters for the feature engineering pipeline."""
+    ValidateParams(
+        hf_model_name=hf_model_name,
+        max_length=max_length,
+        stride=stride,
+        device=device,
+    )
+
 
 def load_model_and_tokenizer(model_name: str) -> tuple[transformers.PreTrainedModel, transformers.PreTrainedTokenizer]:
     """

@@ -8,6 +8,7 @@ from kedro.pipeline import Node, Pipeline
 from impostor_hunt_in_texts.pipelines.feature_engineering.nodes import (
     extract_features,
     load_model_and_tokenizer,
+    validate_input_params,
 )
 from impostor_hunt_in_texts.utils.utils import load_hf_datasetdict, split_dataset_dict
 
@@ -16,6 +17,17 @@ def create_pipeline(**kwargs) -> Pipeline:
     """Create the feature engineering pipeline."""
     return Pipeline(
         nodes=[
+            Node(
+                func=validate_input_params,
+                inputs={
+                    "hf_model_name": "params:hf_model_name",
+                    "max_length": "params:max_length",
+                    "stride": "params:stride",
+                    "device": "params:device",
+                },
+                outputs=None,
+                name="Validate_input_parameters_feature_engineering",
+            ),
             Node(
                 func=load_hf_datasetdict,
                 inputs="dict_metadata_datasets",
