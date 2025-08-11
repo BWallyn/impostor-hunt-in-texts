@@ -18,6 +18,7 @@ dependencies = [
  "kedro-datasets[matplotlib-matplotlibwriter,pandas-csvdataset,pandas-exceldataset,pandas-parquetdataset,plotly-jsondataset,plotly-plotlydataset]>=4.1.0",
  "transformers>=4.55.0",
  "torch",
+ "pydantic>=2.11.7",
 ]
 
 [project.scripts]

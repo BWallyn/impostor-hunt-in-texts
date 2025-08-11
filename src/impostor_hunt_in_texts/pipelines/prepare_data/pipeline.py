@@ -6,6 +6,7 @@ from impostor_hunt_in_texts.pipelines.prepare_data.nodes import (
     create_dataset_test,
     create_dataset_train,
     create_datasets_dict,
+    validate_input_params,
 )
 from impostor_hunt_in_texts.utils.utils import save_hf_datasetdict
 
@@ -14,6 +15,16 @@ def create_pipeline(**kwargs) -> Pipeline:
     """Create the prepare data pipeline."""
     return Pipeline(
         nodes=[
+            Node(
+                func=validate_input_params,
+                inputs= {
+                    "path_data_train": "params:path_data_train",
+                    "path_data_test": "params:path_data_test",
+                    "path_dataset_dict": "params:path_dataset_dict",
+                },
+                outputs=None,
+                name="Validate_input_parameters_prepare_data",
+            ),
             Node(
                 func=create_dataset_train,
                 inputs=["df_train", "params:path_data_train"],
