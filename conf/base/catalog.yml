@@ -10,6 +10,9 @@ df_train:
   filepath: data/01_raw/train.csv
   load_args:
     sep: ","
+  metadata:
+    kedro-viz:
+      layer: "prepare_data"
 
 # dataset_train:
 #   type: kedro_hf_datasets.HFDataset
@@ -23,3 +26,23 @@ df_train:
 dict_metadata_datasets:
   type: pickle.PickleDataset
   filepath: data/02_intermediate/dict_metadata_datasets.pkl
+  metadata:
+    kedro-viz:
+      layer: "prepare_data"
+
+
+# ==== Feature engineering ====
+
+df_train_features:
+  type: pandas.ParquetDataset
+  filepath: data/05_model_input/df_train_features.parquet
+  metadata:
+    kedro-viz:
+      layer: "feature_engineering"
+
+df_test_features:
+  type: pandas.ParquetDataset
+  filepath: data/05_model_input/df_test_features.parquet
+  metadata:
+    kedro-viz:
+      layer: "feature_engineering"

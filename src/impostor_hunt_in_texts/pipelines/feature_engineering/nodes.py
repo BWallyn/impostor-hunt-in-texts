@@ -7,6 +7,7 @@ generated using Kedro 1.0.0
 # =================
 
 import numpy as np
+import pandas as pd
 import torch
 import transformers
 from datasets import Dataset
@@ -122,7 +123,7 @@ def extract_features(  # noqa: PLR0913
     max_length: int = 512,
     stride: int = 256,
     device: str = "cpu",
-) -> tuple[np.ndarray, list]:
+) -> tuple[np.ndarray, list[int]]:
     """
     Extract interaction-based features from each text pair.
 
@@ -136,7 +137,7 @@ def extract_features(  # noqa: PLR0913
 
     Returns:
         features (np.ndarray): Features extracted from the text pairs.
-        ids (list[str]): List of sample IDs.
+        ids (list[int]): List of sample IDs.
     """
     features = []
     ids = []
@@ -155,3 +156,20 @@ def extract_features(  # noqa: PLR0913
         ids.append(row['id'])
 
     return np.array(features), ids
+
+
+def convert_features_to_dataframe(dataset_features: np.ndarray, ids: list[int]) -> pd.DataFrame:
+    """
+    Convert the features extracted from the texts to a pandas DataFrame.
+
+    Args:
+        dataset_features (np.array): The features extracted from the text using the huggingface model.
+        ids (list[int]): List of the IDs.
+
+    Returns:
+        (pd.DataFrame): A DataFrame containing the features with columns for each feature and the ids.
+    """
+    return pd.concat([
+        pd.DataFrame({"id": ids}),
+        pd.DataFrame(dataset_features, columns=[f"token_feat_{i}" for i in range(dataset_features.shape[1])]),
+    ], axis=1)
