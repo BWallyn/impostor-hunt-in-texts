@@ -160,7 +160,7 @@ def extract_features(  # noqa: PLR0913
 
 def convert_features_to_dataframe(dataset_features: np.ndarray) -> pd.DataFrame:
     """
-    Convert the features extracted from the dataset to a pandas DataFrame.
+    Convert the features extracted from the texts to a pandas DataFrame.
 
     Args:
         dataset_features (np.array): The features extracted from the text using the huggingface model.
