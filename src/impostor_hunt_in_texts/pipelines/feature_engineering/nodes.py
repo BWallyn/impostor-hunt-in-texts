@@ -7,6 +7,7 @@ generated using Kedro 1.0.0
 # =================
 
 import numpy as np
+import pandas as pd
 import torch
 import transformers
 from datasets import Dataset
@@ -155,3 +156,16 @@ def extract_features(  # noqa: PLR0913
         ids.append(row['id'])
 
     return np.array(features), ids
+
+
+def convert_features_to_dataframe(dataset_features: np.ndarray) -> pd.DataFrame:
+    """
+    Convert the features extracted from the dataset to a pandas DataFrame.
+
+    Args:
+        dataset_features (np.array): The features extracted from the text using the huggingface model.
+
+    Returns:
+        (pd.DataFrame): A DataFrame containing the features with columns for each feature.
+    """
+    return pd.DataFrame(dataset_features, columns=[f"token_feat_{i}" for i in range(dataset_features.shape[1])])
