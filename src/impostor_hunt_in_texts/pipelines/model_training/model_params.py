@@ -2,9 +2,9 @@
 # ==== IMPORTS ====
 # =================
 
-from typing import Any, Optional
+from typing import Any
 
-from pydantic import BaseModel, Field, StrictInt, StrictStr
+from pydantic import BaseModel, Field, StrictStr
 
 # ===============
 # ==== CLASS ====
