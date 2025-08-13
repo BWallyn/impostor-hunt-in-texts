@@ -11,7 +11,7 @@ from typing import Any
 import mlflow
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -23,6 +23,24 @@ from sklearn.model_selection import StratifiedKFold
 # ===================
 # ==== FUNCTIONS ====
 # ===================
+
+def _train_model_rf(df: pd.DataFrame, labels: pd.Series, params: dict[str, Any]) -> RandomForestClassifier:
+    """
+    Train a RandomForestClassifier model.
+
+    Args:
+        df (pd.DataFrame): The training data.
+        labels (pd.Series): The target labels.
+        params (dict[str, Any]): The parameters for the model.
+
+    Returns:
+        (RandomForestClassifier): The trained model.
+    """
+    # Initialize the model
+    model = RandomForestClassifier(**params, random_state=42)
+    model.fit(df, labels)
+    return model
+
 
 def _train_model_hgbm(df: pd.DataFrame, labels: pd.Series, params: dict[str, Any]) -> HistGradientBoostingClassifier:
     """
@@ -37,9 +55,7 @@ def _train_model_hgbm(df: pd.DataFrame, labels: pd.Series, params: dict[str, Any
         (HistGradientBoostingClassifier): The trained model.
     """
     # Initialize the model
-    model = HistGradientBoostingClassifier(
-        **params
-    )
+    model = HistGradientBoostingClassifier(**params, random_state=42)
     model.fit(df, labels)
     return model
 
