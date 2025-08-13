@@ -20,9 +20,28 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import StratifiedKFold
 
+from impostor_hunt_in_texts.pipelines.model_training.model_params import ModelParams
+
 # ===================
 # ==== FUNCTIONS ====
 # ===================
+
+def initialize_model_params(model_name: str, params: dict[str, Any]) -> ModelParams:
+    """
+    Initialize the model parameters.
+
+    Args:
+        model_name (str): The name of the model to use.
+        params (dict[str, Any]): The parameters for the model.
+
+    Returns:
+        (ModelParams): The initialized model parameters.
+    """
+    return ModelParams(
+        model_name=model_name,
+        params=params,
+    )
+
 
 def _train_model_rf(df: pd.DataFrame, labels: pd.Series, params: dict[str, Any]) -> RandomForestClassifier:
     """
@@ -63,7 +82,7 @@ def _train_model_hgbm(df: pd.DataFrame, labels: pd.Series, params: dict[str, Any
 def train_model_cross_validate(
     x_training: pd.DataFrame,
     y_training: pd.Series,
-    params: dict[str, Any],
+    model_params: ModelParams,
 ):
     """
     Train the model to predict the impostor label using cross-validation.
@@ -71,7 +90,7 @@ def train_model_cross_validate(
     Args:
         x_training (pd.DataFrame): The training features.
         y_training (pd.Series): The target labels.
-        params (dict[str, Any]): The parameters for the model.
+        model_params (ModelParams): The parameters for the model.
     """
     # Define the folds using stratify to maintain class distribution
     kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -89,7 +108,10 @@ def train_model_cross_validate(
             y_train, y_valid = y_training[train_idx], y_training[valid_idx]
 
             # Train the model
-            model = _train_model_hgbm(x_train, y_train, params)
+            if model_params.model_name == "RandomForest":
+                model = _train_model_rf(x_train, y_train, model_params.params)
+            elif model_params.model_name == "HistGradientBoosting":
+                model = _train_model_hgbm(x_train, y_train, model_params.params)
             # y_pred_train = model.predict(x_train)
             y_pred_valid = model.predict(x_valid)
 
