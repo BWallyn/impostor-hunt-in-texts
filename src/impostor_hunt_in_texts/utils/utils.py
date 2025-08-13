@@ -23,7 +23,7 @@ def save_hf_datasetdict(dataset_dict: DatasetDict, path_to_save: str) -> dict[st
     return {"save_path": path_to_save}
 
 
-def load_hf_datasetdict(dict_metadata_datasets: dict[str, str]) -> DatasetDict:
+def load_hf_datasetdict(dict_metadata_datasets: dict[str, str], params_val: bool) -> DatasetDict:
     """
     Load the Hugging Face DatasetDict from the model metadata dictionary.
 

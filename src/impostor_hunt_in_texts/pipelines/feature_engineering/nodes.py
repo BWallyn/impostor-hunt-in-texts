@@ -26,7 +26,7 @@ def validate_input_params(
     max_length: int,
     stride: int,
     device: str,
-) -> None:
+) -> bool:
     """Validate the input parameters for the feature engineering pipeline."""
     ValidateParams(
         hf_model_name=hf_model_name,
@@ -34,6 +34,7 @@ def validate_input_params(
         stride=stride,
         device=device,
     )
+    return True
 
 
 def load_model_and_tokenizer(model_name: str) -> tuple[transformers.PreTrainedModel, transformers.PreTrainedTokenizer]:
