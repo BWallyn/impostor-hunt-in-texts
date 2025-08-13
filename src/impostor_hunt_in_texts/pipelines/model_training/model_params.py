@@ -1,0 +1,25 @@
+# =================
+# ==== IMPORTS ====
+# =================
+
+from typing import Any, Optional
+
+from pydantic import BaseModel, Field, StrictInt, StrictStr
+
+# ===============
+# ==== CLASS ====
+# ===============
+
+class ModelParams(BaseModel):
+    """Class to store the model parameters."""
+
+    model_name: StrictStr = Field(
+        pattern=r"^(RandomForest|HistGradientBoosting)$",
+        description="Name of the model to use for training.",
+        frozen=True,
+    )
+    params: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Parameters for the model. The parameters depend on the model type.",
+        frozen=True
+    )
