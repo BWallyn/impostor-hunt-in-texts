@@ -149,4 +149,4 @@ def train_model_cross_validate(
         mlflow.log_metrics(metrics)
 
         # Log the model
-        mlflow.sklearn.log_model(model, "model")
+        mlflow.sklearn.log_model(model, name="model", input_example=x_training.sample(5))
