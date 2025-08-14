@@ -3,7 +3,7 @@
 # =================
 
 from datetime import UTC, datetime
-from os import Path
+from pathlib import Path
 from typing import Optional
 
 import mlflow
