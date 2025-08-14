@@ -139,10 +139,62 @@ def train_model_cross_validate(
 
         # Average metrics across folds
         metrics = {
-            "accuracy": np.mean(accuracies),
-            "precision": np.mean(precisions),
-            "recall": np.mean(recalls),
-            "f1_score": np.mean(f1_scores),
+            "accuracy_valid": np.mean(accuracies),
+            "precision_valid": np.mean(precisions),
+            "recall_valid": np.mean(recalls),
+            "f1_score_valid": np.mean(f1_scores),
+        }
+
+        # Log the metrics to MLflow
+        mlflow.log_metrics(metrics)
+
+        # Log the model
+        mlflow.sklearn.log_model(model, name="model", input_example=x_train.sample(5))
+
+
+def train_final_model(  # noqa: PLR0913
+    x_training: pd.DataFrame,
+    y_training: pd.Series,
+    x_test: pd.DataFrame,
+    y_test: pd.Series,
+    model_params: ModelParams,
+    experiment_id: str,
+) -> None:
+    """
+    Train the final model on the entire training set and evaluate it on the test set.
+
+    Args:
+        x_training (pd.DataFrame): The training features.
+        y_training (pd.Series): The target labels for training.
+        x_test (pd.DataFrame): The test features.
+        y_test (pd.Series): The target labels for test.
+        model_params (ModelParams): The parameters for the model.
+        experiment_id (str): The id of the MLflow experiment.
+
+    Returns:
+        None
+    """
+    # Set the MLflow run
+    tags = {"model_name": "final_model", "model_type": model_params.model_name}
+    with mlflow.start_run(experiment_id=experiment_id, tags=tags):
+        # Train the model
+        if model_params.model_name == "RandomForestClassifier":
+            model = _train_model_rf(x_training, y_training, model_params.params)
+        elif model_params.model_name == "HistGradientBoosting":
+            model = _train_model_hgbm(x_training, y_training, model_params.params)
+        y_pred_training = model.predict(x_training)
+        y_pred_test = model.predict(x_test)
+
+        # Compute metrics
+        metrics = {
+            "accuracy_training": accuracy_score(y_true=y_training, y_pred=y_pred_training),
+            "precision_training": precision_score(y_true=y_training, y_pred=y_pred_training),
+            "recall_training": recall_score(y_true=y_training, y_pred=y_pred_training),
+            "f1_score_training": f1_score(y_true=y_training, y_pred=y_pred_training),
+            "accuracy_test": accuracy_score(y_true=y_test, y_pred=y_pred_test),
+            "precision_test": precision_score(y_true=y_test, y_pred=y_pred_test),
+            "recall_test": recall_score(y_true=y_test, y_pred=y_pred_test),
+            "f1_score_test": f1_score(y_true=y_test, y_pred=y_pred_test),
         }
 
         # Log the metrics to MLflow
