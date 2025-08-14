@@ -11,6 +11,7 @@ from impostor_hunt_in_texts.pipelines.model_training.mlflow import (
 from impostor_hunt_in_texts.pipelines.model_training.nodes import (
     initialize_model_params,
     split_data_labels,
+    train_final_model,
     train_model_cross_validate,
 )
 
@@ -66,6 +67,19 @@ def create_pipeline(**kwargs) -> Pipeline:
                 },
                 outputs=None,
                 name="Train_model_using_cross_validation",
+            ),
+            Node(
+                func=train_final_model,
+                inputs={
+                    "x_training": "x_training",
+                    "y_training": "y_training",
+                    "x_test": "x_test",
+                    "y_test": "y_test",
+                    "model_params": "model_params",
+                    "experiment_id": "experiment_id",
+                },
+                outputs=None,
+                name="Train_final_model",
             ),
         ],
         namespace="model_training",
