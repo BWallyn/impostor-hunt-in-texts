@@ -7,7 +7,7 @@
 # Parameters for the mlflow tracking
 model_training.experiment_folder_path: "./mlflow_experiments/"
 model_training.experiment_name: "impostor_hunt_in_texts"
-model_training.experiment_id_saved:
+model_training.experiment_id_saved: "247466202237108334"
 
 # Parameters to split data
 model_training.label_column: "id"
