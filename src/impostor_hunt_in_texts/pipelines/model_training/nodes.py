@@ -124,7 +124,7 @@ def train_model_cross_validate(
             y_train, y_valid = y_training[train_idx], y_training[valid_idx]
 
             # Train the model
-            if model_params.model_name == "RandomForest":
+            if model_params.model_name == "RandomForestClassifier":
                 model = _train_model_rf(x_train, y_train, model_params.params)
             elif model_params.model_name == "HistGradientBoosting":
                 model = _train_model_hgbm(x_train, y_train, model_params.params)
