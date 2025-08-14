@@ -14,7 +14,7 @@ class ModelParams(BaseModel):
     """Class to store the model parameters."""
 
     model_name: StrictStr = Field(
-        pattern=r"^(RandomForest|HistGradientBoosting)$",
+        pattern=r"^(RandomForestClassifier|HistGradientBoosting)$",
         description="Name of the model to use for training.",
         frozen=True,
     )
