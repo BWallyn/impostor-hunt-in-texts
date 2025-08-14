@@ -5,8 +5,13 @@ generated using Kedro 1.0.0
 
 from kedro.pipeline import Node, Pipeline
 
+from impostor_hunt_in_texts.pipelines.model_training.mlflow import (
+    create_mlflow_experiment,
+)
 from impostor_hunt_in_texts.pipelines.model_training.nodes import (
     initialize_model_params,
+    split_data_labels,
+    train_model_cross_validate,
 )
 
 
@@ -15,6 +20,16 @@ def create_pipeline(**kwargs) -> Pipeline:
     return Pipeline(
         nodes=[
             Node(
+                func=create_mlflow_experiment,
+                inputs={
+                    "experiment_folder_path": "params:experiment_folder_path",
+                    "experiment_name": "params:experiment_name",
+                    "experiment_id": "params:experiment_id_saved",
+                },
+                outputs="experiment_id",
+                name="Create_or_load_mlflow_experiment",
+            ),
+            Node(
                 func=initialize_model_params,
                 inputs={
                     "model_name": "params:model_name",
@@ -22,7 +37,37 @@ def create_pipeline(**kwargs) -> Pipeline:
                 },
                 outputs="model_params",
                 name="Initialize_model_parameters",
-            )
+            ),
+            Node(
+                func=split_data_labels,
+                inputs={
+                    "df": "df_train_features",
+                    "label_column": "params:label_column",
+                },
+                outputs=["x_training", "y_training"],
+                name="Split_data_labels_training",
+            ),
+            Node(
+                func=split_data_labels,
+                inputs={
+                    "df": "df_test_features",
+                    "label_column": "params:label_column",
+                },
+                outputs=["x_test", "y_test"],
+                name="Split_data_labels_test",
+            ),
+            Node(
+                func=train_model_cross_validate,
+                inputs={
+                    "x_training": "x_training",
+                    "y_training": "y_training",
+                    "model_params": "model_params",
+                    "experiment_id": "experiment_id",
+                },
+                outputs=None,
+                name="Train_model_using_cross_validation",
+            ),
         ],
         namespace="model_training",
+        inputs=["df_train_features", "df_test_features"],
     )
