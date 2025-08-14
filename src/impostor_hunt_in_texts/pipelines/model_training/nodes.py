@@ -79,10 +79,25 @@ def _train_model_hgbm(df: pd.DataFrame, labels: pd.Series, params: dict[str, Any
     return model
 
 
+def split_data_labels(df: pd.DataFrame, label_column: str) -> tuple[pd.DataFrame, pd.Series]:
+    """
+    Split the DataFrame into features and labels.
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the data.
+        label_column (str): The name of the column containing the labels.
+
+    Returns:
+        (tuple[pd.DataFrame, pd.Series]): A tuple containing the features DataFrame and the labels Series.
+    """
+    return df.drop(columns=[label_column]), df[label_column]
+
+
 def train_model_cross_validate(
     x_training: pd.DataFrame,
     y_training: pd.Series,
     model_params: ModelParams,
+    experiment_id: str,
 ):
     """
     Train the model to predict the impostor label using cross-validation.
@@ -91,6 +106,7 @@ def train_model_cross_validate(
         x_training (pd.DataFrame): The training features.
         y_training (pd.Series): The target labels.
         model_params (ModelParams): The parameters for the model.
+        experiment_id (str): The id of the MLflow experiment.
     """
     # Define the folds using stratify to maintain class distribution
     kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -101,7 +117,7 @@ def train_model_cross_validate(
     f1_scores = []
 
     # Set the MLflow run
-    with mlflow.start_run():
+    with mlflow.start_run(experiment_id=experiment_id):
         # Loop over the folds
         for train_idx, valid_idx in kf.split(x_training, y_training):
             x_train, x_valid = x_training.iloc[train_idx], x_training.iloc[valid_idx]
