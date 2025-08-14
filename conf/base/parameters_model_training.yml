@@ -4,6 +4,14 @@
 # Documentation for this file format can be found in "Parameters"
 # Link: https://docs.kedro.org/en/1.0.0/configuration/parameters.html
 
+# Parameters for the mlflow tracking
+model_training.experiment_folder_path: "./mlflow_experiments/"
+model_training.experiment_name: "impostor_hunt_in_texts"
+model_training.experiment_id_saved:
+
+# Parameters to split data
+model_training.label_column: "id"
+
 # Parameters for the Random forest model
 model_training.model_name: "RandomForestClassifier"
 model_training.model_params:
