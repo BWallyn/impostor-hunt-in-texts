@@ -152,7 +152,7 @@ def train_model_cross_validate(
         mlflow.sklearn.log_model(model, name="model", input_example=x_train.sample(5))
 
 
-def train_final_model(  # noqa: PLR0913
+def train_final_model(
     x_training: pd.DataFrame,
     y_training: pd.Series,
     model_params: ModelParams,
