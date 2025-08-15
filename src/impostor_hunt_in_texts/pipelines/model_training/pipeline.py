@@ -49,15 +49,6 @@ def create_pipeline(**kwargs) -> Pipeline:
                 name="Split_data_labels_training",
             ),
             Node(
-                func=split_data_labels,
-                inputs={
-                    "df": "df_test_features",
-                    "label_column": "params:label_column",
-                },
-                outputs=["x_test", "y_test"],
-                name="Split_data_labels_test",
-            ),
-            Node(
                 func=train_model_cross_validate,
                 inputs={
                     "x_training": "x_training",
@@ -73,8 +64,6 @@ def create_pipeline(**kwargs) -> Pipeline:
                 inputs={
                     "x_training": "x_training",
                     "y_training": "y_training",
-                    "x_test": "x_test",
-                    "y_test": "y_test",
                     "model_params": "model_params",
                     "experiment_id": "experiment_id",
                 },
@@ -83,5 +72,5 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
         ],
         namespace="model_training",
-        inputs=["df_train_features", "df_test_features"],
+        inputs="df_train_features",
     )

@@ -155,8 +155,6 @@ def train_model_cross_validate(
 def train_final_model(  # noqa: PLR0913
     x_training: pd.DataFrame,
     y_training: pd.Series,
-    x_test: pd.DataFrame,
-    y_test: pd.Series,
     model_params: ModelParams,
     experiment_id: str,
 ) -> None:
@@ -166,8 +164,6 @@ def train_final_model(  # noqa: PLR0913
     Args:
         x_training (pd.DataFrame): The training features.
         y_training (pd.Series): The target labels for training.
-        x_test (pd.DataFrame): The test features.
-        y_test (pd.Series): The target labels for test.
         model_params (ModelParams): The parameters for the model.
         experiment_id (str): The id of the MLflow experiment.
 
@@ -183,7 +179,6 @@ def train_final_model(  # noqa: PLR0913
         elif model_params.model_name == "HistGradientBoosting":
             model = _train_model_hgbm(x_training, y_training, model_params.params)
         y_pred_training = model.predict(x_training)
-        y_pred_test = model.predict(x_test)
 
         # Compute metrics
         metrics = {
@@ -191,10 +186,6 @@ def train_final_model(  # noqa: PLR0913
             "precision_training": precision_score(y_true=y_training, y_pred=y_pred_training),
             "recall_training": recall_score(y_true=y_training, y_pred=y_pred_training),
             "f1_score_training": f1_score(y_true=y_training, y_pred=y_pred_training),
-            "accuracy_test": accuracy_score(y_true=y_test, y_pred=y_pred_test),
-            "precision_test": precision_score(y_true=y_test, y_pred=y_pred_test),
-            "recall_test": recall_score(y_true=y_test, y_pred=y_pred_test),
-            "f1_score_test": f1_score(y_true=y_test, y_pred=y_pred_test),
         }
 
         # Log the metrics to MLflow
