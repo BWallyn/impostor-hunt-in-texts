@@ -13,6 +13,7 @@ from impostor_hunt_in_texts.pipelines.model_training.nodes import (
     split_data_labels,
     train_final_model,
     train_model_cross_validate,
+    validate_params,
 )
 
 
@@ -20,6 +21,19 @@ def create_pipeline(**kwargs) -> Pipeline:
     """Create the model training pipeline."""
     return Pipeline(
         nodes=[
+            Node(
+                func=validate_params,
+                inputs={
+                    "experiment_folder_path": "params:experiment_folder_path",
+                    "experiment_name": "params:experiment_name",
+                    "experiment_id_saved": "params:experiment_id_saved",
+                    "model_name": "params:model_name",
+                    "model_params": "params:model_params",
+                    "label_column": "params:label_column",
+                },
+                outputs=None,
+                name="Validate_input_parameters_model_training",
+            ),
             Node(
                 func=create_mlflow_experiment,
                 inputs={
