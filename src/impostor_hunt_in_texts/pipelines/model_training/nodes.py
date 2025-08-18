@@ -21,10 +21,32 @@ from sklearn.metrics import (
 from sklearn.model_selection import StratifiedKFold
 
 from impostor_hunt_in_texts.pipelines.model_training.model_params import ModelParams
+from impostor_hunt_in_texts.pipelines.model_training.validate_params import (
+    ValidateParams,
+)
 
 # ===================
 # ==== FUNCTIONS ====
 # ===================
+
+def validate_params(  # noqa: PLR0913
+    experiment_folder_path: str,
+    experiment_name: str,
+    experiment_id_saved: str,
+    model_name: str,
+    model_params: dict[str, Any],
+    label_column: str,
+) -> None:
+    """Validate the input parameters for the model training pipeline."""
+    ValidateParams(
+        experiment_folder_path=experiment_folder_path,
+        experiment_name=experiment_name,
+        experiment_id_saved=experiment_id_saved,
+        model_name=model_name,
+        model_params=model_params,
+        label_column=label_column,
+    )
+
 
 def initialize_model_params(model_name: str, params: dict[str, Any]) -> ModelParams:
     """
