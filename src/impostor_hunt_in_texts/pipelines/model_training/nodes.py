@@ -11,6 +11,7 @@ from typing import Any
 import mlflow
 import numpy as np
 import pandas as pd
+from sklearn.decomposition import PCA
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
@@ -19,6 +20,7 @@ from sklearn.metrics import (
     recall_score,
 )
 from sklearn.model_selection import StratifiedKFold
+from sklearn.pipeline import Pipeline
 
 from impostor_hunt_in_texts.pipelines.model_training.model_params import ModelParams
 from impostor_hunt_in_texts.pipelines.model_training.validate_params import (
@@ -99,6 +101,32 @@ def _train_model_hgbm(df: pd.DataFrame, labels: pd.Series, params: dict[str, Any
     model = HistGradientBoostingClassifier(**params, random_state=42)
     model.fit(df, labels)
     return model
+
+
+def _create_pipeline_model(model_name: str, n_comp: int, params: dict[str, Any]) -> Pipeline:
+    """
+    Create scikit-learn pipeline with PCA and a classifier.
+
+    Args:
+        model_name (str): Name of the model to use as a classifier.
+        n_comp (int): Number of components to get from the PCA.
+        params (dict[str, Any]): Parameters for the model.
+
+    Returns:
+        (Pipeline): The scikit learn pipeline containing a PCA and a classifier.
+    """
+    estimators = [
+        ("reduce_dim", PCA(n_components=n_comp)),
+    ]
+    if model_name == "HistGradientBoostingClassifier":
+        estimators.append(
+            ("classifier", HistGradientBoostingClassifier(**params, random_state=42))
+        )
+    elif model_name == "RandomForestClassifier":
+        estimators.append(
+            ("classifier", RandomForestClassifier(**params, random_state=42))
+        )
+    return Pipeline(estimators)
 
 
 def split_data_labels(df: pd.DataFrame, label_column: str) -> tuple[pd.DataFrame, pd.Series]:
