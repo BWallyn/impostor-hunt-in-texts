@@ -4,10 +4,13 @@
 
 from unittest.mock import MagicMock, patch
 
+import numpy as np
+import pandas as pd
 import pytest
 import torch
 from impostor_hunt_in_texts.pipelines.feature_engineering.nodes import (
     # _extract_mean_pooling_vector,
+    convert_features_to_dataframe,
     extract_features,
     load_model_and_tokenizer,
 )
@@ -285,3 +288,61 @@ def test_extract_features_device():
             mock_extract.assert_called_with(
                 mock_dataset[0]["text2"], tokenizer, model, 512, 256, "cuda"
             )
+
+
+# ==== Convert features to dataframe ====
+
+def test_convert_features_to_dataframe_basic():
+    """Test the conversion of features to a dataframe."""
+    # Mock features and ids
+    dataset_features = np.array([
+        [1.1, 2.2, 3.3],
+        [4.4, 5.5, 6.6],
+    ])
+    ids = [101, 102]
+
+    # Call the function
+    df = convert_features_to_dataframe(dataset_features, ids)
+
+    # Assertions
+    assert isinstance(df, pd.DataFrame)
+    assert df.shape == (2, 4)  # 2 rows, 1 id column + 3 feature columns
+    assert list(df.columns) == ["id", "token_feat_0", "token_feat_1", "token_feat_2"]
+    assert list(df["id"]) == ids
+    assert list(df["token_feat_0"]) == [1.1, 4.4]
+    assert list(df["token_feat_1"]) == [2.2, 5.5]
+    assert list(df["token_feat_2"]) == [3.3, 6.6]
+
+def test_convert_features_to_dataframe_empty():
+    """Test the conversion of features to a dataframe with empty numpy array."""
+    # Mock empty features and ids
+    dataset_features = np.array([])
+    dataset_features.resize((0, 3))  # Empty 2D array with 3 columns
+    ids = []
+
+    # Call the function
+    df = convert_features_to_dataframe(dataset_features, ids)
+
+    # Assertions
+    assert isinstance(df, pd.DataFrame)
+    assert df.shape == (0, 4)  # 0 rows, 1 id column + 3 feature columns
+    assert list(df.columns) == ["id", "token_feat_0", "token_feat_1", "token_feat_2"]
+
+def test_convert_features_to_dataframe_single_feature():
+    """Test the conversion of features to a dataframe with a single feature."""
+    # Mock features and ids with a single feature
+    dataset_features = np.array([
+        [1.1],
+        [4.4],
+    ])
+    ids = [101, 102]
+
+    # Call the function
+    df = convert_features_to_dataframe(dataset_features, ids)
+
+    # Assertions
+    assert isinstance(df, pd.DataFrame)
+    assert df.shape == (2, 2)  # 2 rows, 1 id column + 1 feature column
+    assert list(df.columns) == ["id", "token_feat_0"]
+    assert list(df["id"]) == ids
+    assert list(df["token_feat_0"]) == [1.1, 4.4]
