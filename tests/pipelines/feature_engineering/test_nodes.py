@@ -5,8 +5,10 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+import torch
 from impostor_hunt_in_texts.pipelines.feature_engineering.nodes import (
     # _extract_mean_pooling_vector,
+    extract_features,
     load_model_and_tokenizer,
 )
 from transformers import PreTrainedModel, PreTrainedTokenizer
@@ -180,3 +182,106 @@ def test_load_model_and_tokenizer_tokenizer_error():
 
 #     # Assertions
 #     assert torch.isnan(result).any()  # Division by zero
+
+# ==== Extract features ====
+
+def test_extract_features_basic():
+    """Test the extraction of features from a basic dataset."""
+    # Mock dataset
+    mock_dataset = [
+        {"id": 1, "text1": "hello world", "text2": "world hello"},
+        {"id": 2, "text1": "foo bar", "text2": "bar foo"},
+    ]
+
+    # Mock tokenizer and model
+    tokenizer = MagicMock(spec=PreTrainedTokenizer)
+    model = MagicMock(spec=PreTrainedModel)
+
+    # Mock _extract_mean_pooling_vector to return fixed vectors
+    mock_vec1 = torch.randn(10)
+    mock_vec2 = torch.randn(10)
+    with patch(
+        "impostor_hunt_in_texts.pipelines.feature_engineering.nodes._extract_mean_pooling_vector",
+        side_effect=[mock_vec1, mock_vec2, mock_vec1, mock_vec2],
+    ) as mock_extract:
+
+        # Call the function
+        features, ids = extract_features(
+            dataset=mock_dataset,
+            tokenizer=tokenizer,
+            model=model,
+            max_length=512,
+            stride=256,
+            device="cpu",
+        )
+
+        # Assertions
+        assert len(features) == 2
+        assert len(ids) == 2
+        assert ids == [1, 2]
+        assert features.shape == (2, 40)  # 4 * 10 (vec1, vec2, diff, prod)
+        mock_extract.assert_called_with(
+            mock_dataset[1]["text2"], tokenizer, model, 512, 256, "cpu"
+        )
+
+        # Check feature construction
+        expected_vec = torch.cat([mock_vec1, mock_vec2, mock_vec1 - mock_vec2, mock_vec1 * mock_vec2])
+        assert torch.allclose(torch.tensor(features[0]), expected_vec, atol=1e-6)
+
+def test_extract_features_empty_dataset():
+    """Test the extraction of features from an empty dataset."""
+    # Mock empty dataset
+    mock_dataset = []
+
+    # Mock tokenizer and model
+    tokenizer = MagicMock(spec=PreTrainedTokenizer)
+    model = MagicMock(spec=PreTrainedModel)
+
+    # Call the function
+    features, ids = extract_features(
+        dataset=mock_dataset,
+        tokenizer=tokenizer,
+        model=model,
+        max_length=512,
+        stride=256,
+        device="cpu",
+    )
+
+    # Assertions
+    assert len(features) == 0
+    assert len(ids) == 0
+
+def test_extract_features_device():
+    """Test the extraction of features with a specific device."""
+    # Mock dataset
+    mock_dataset = [{"id": 1, "text1": "hello", "text2": "world"}]
+
+    # Mock tokenizer and model
+    tokenizer = MagicMock(spec=PreTrainedTokenizer)
+    model = MagicMock(spec=PreTrainedModel)
+
+    # Mock _extract_mean_pooling_vector
+    mock_vec1 = torch.randn(10)
+    mock_vec2 = torch.randn(10)
+    with patch(
+        "impostor_hunt_in_texts.pipelines.feature_engineering.nodes._extract_mean_pooling_vector",
+        side_effect=[mock_vec1, mock_vec2],
+    ) as mock_extract:
+
+        # Call the function with cuda
+        with patch("torch.cuda.is_available", return_value=True):
+            features, ids = extract_features(
+                dataset=mock_dataset,
+                tokenizer=tokenizer,
+                model=model,
+                max_length=512,
+                stride=256,
+                device="cuda",
+            )
+
+            # Assertions
+            assert len(features) == 1
+            assert len(ids) == 1
+            mock_extract.assert_called_with(
+                mock_dataset[0]["text2"], tokenizer, model, 512, 256, "cuda"
+            )
