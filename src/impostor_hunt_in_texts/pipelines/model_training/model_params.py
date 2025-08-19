@@ -18,6 +18,11 @@ class ModelParams(BaseModel):
         description="Name of the model to use for training.",
         frozen=True,
     )
+    pca_n_components: int = Field(
+        ge=1,
+        description="Number of components to get from the PCA.",
+        frozen=True,
+    )
     params: dict[str, Any] = Field(
         default_factory=dict,
         description="Parameters for the model. The parameters depend on the model type.",
