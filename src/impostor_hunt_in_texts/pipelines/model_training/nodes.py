@@ -243,11 +243,11 @@ def train_final_model(
         experiment_id (str): The id of the MLflow experiment.
 
     Returns:
-        (str): The ID of the MLflow run.
+        (str): The model ID in the MLflow tracking.
     """
     # Set the MLflow run
     tags = {"model_name": "final_model", "model_type": model_params.model_name}
-    with mlflow.start_run(experiment_id=experiment_id, tags=tags) as run:
+    with mlflow.start_run(experiment_id=experiment_id, tags=tags):
         # Define the model pipeline
         pipe = _create_pipeline_model(
             model_name=model_params.model_name,
@@ -270,6 +270,6 @@ def train_final_model(
         mlflow.log_metrics(metrics)
 
         # Log the model
-        mlflow.sklearn.log_model(pipe, name="model", input_example=x_training.sample(5))
+        model = mlflow.sklearn.log_model(pipe, name="model", input_example=x_training.sample(5))
 
-    return run.info.run_id
+    return model.model_id
