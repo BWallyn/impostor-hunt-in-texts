@@ -50,9 +50,9 @@ df_test_features:
 
 # ==== Model training ====
 
-run_id:
+model_id:
   type: pickle.PickleDataset
-  filepath: data/06_models/model_run_id.pkl
+  filepath: data/06_models/model_id.pkl
   metadata:
     kedro-viz:
       layer: "model_training"
