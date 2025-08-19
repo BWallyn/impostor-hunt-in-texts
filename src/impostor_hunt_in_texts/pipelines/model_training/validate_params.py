@@ -4,7 +4,7 @@
 
 from typing import Any
 
-from pydantic import BaseModel, Field, StrictStr
+from pydantic import BaseModel, Field, StrictInt, StrictStr
 
 # ===============
 # ==== CLASS ====
@@ -31,6 +31,11 @@ class ValidateParams(BaseModel):
     model_name: StrictStr = Field(
         pattern=r"^(RandomForestClassifier|HistGradientBoostingClassifier)$",
         description="Type of model to train.",
+        frozen=True,
+    )
+    model_pca_n_components: StrictInt = Field(
+        ge=1,
+        description="Number of components to get from the PCA.",
         frozen=True,
     )
     model_params: dict[str, Any] = Field(

@@ -28,6 +28,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "experiment_name": "params:experiment_name",
                     "experiment_id_saved": "params:experiment_id_saved",
                     "model_name": "params:model_name",
+                    "model_pca_n_components": "params:pca_n_components",
                     "model_params": "params:model_params",
                     "label_column": "params:label_column",
                 },
@@ -48,6 +49,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                 func=initialize_model_params,
                 inputs={
                     "model_name": "params:model_name",
+                    "pca_n_components": "params:pca_n_components",
                     "params": "params:model_params",
                 },
                 outputs="model_params",
