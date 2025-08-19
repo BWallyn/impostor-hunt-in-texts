@@ -36,6 +36,7 @@ def validate_params(  # noqa: PLR0913
     experiment_name: str,
     experiment_id_saved: str,
     model_name: str,
+    model_pca_n_components: int,
     model_params: dict[str, Any],
     label_column: str,
 ) -> None:
@@ -45,17 +46,19 @@ def validate_params(  # noqa: PLR0913
         experiment_name=experiment_name,
         experiment_id_saved=experiment_id_saved,
         model_name=model_name,
+        model_pca_n_components=model_pca_n_components,
         model_params=model_params,
         label_column=label_column,
     )
 
 
-def initialize_model_params(model_name: str, params: dict[str, Any]) -> ModelParams:
+def initialize_model_params(model_name: str, pca_n_components: int, params: dict[str, Any]) -> ModelParams:
     """
     Initialize the model parameters.
 
     Args:
         model_name (str): The name of the model to use.
+        pca_n_components (int): The number of components to get from the PCA.
         params (dict[str, Any]): The parameters for the model.
 
     Returns:
@@ -63,6 +66,7 @@ def initialize_model_params(model_name: str, params: dict[str, Any]) -> ModelPar
     """
     return ModelParams(
         model_name=model_name,
+        pca_n_components=pca_n_components,
         params=params,
     )
 
@@ -129,6 +133,24 @@ def _create_pipeline_model(model_name: str, n_comp: int, params: dict[str, Any])
     return Pipeline(estimators)
 
 
+def _train_model_pipeline(
+    pipe: Pipeline, df: pd.DataFrame, labels: pd.Series,
+) -> Pipeline:
+    """
+    Train a scikit-learn pipeline.
+
+    Args:
+        pipe (Pipeline): The scikit-learn pipeline to train.
+        df (pd.DataFrame): The training data.
+        labels (pd.Series): The target labels.
+
+    Returns:
+        (Pipeline): The trained pipeline.
+    """
+    pipe.fit(df, labels)
+    return pipe
+
+
 def split_data_labels(df: pd.DataFrame, label_column: str) -> tuple[pd.DataFrame, pd.Series]:
     """
     Split the DataFrame into features and labels.
@@ -173,13 +195,16 @@ def train_model_cross_validate(
             x_train, x_valid = x_training.iloc[train_idx], x_training.iloc[valid_idx]
             y_train, y_valid = y_training[train_idx], y_training[valid_idx]
 
+            # Define the model pipeline
+            pipe = _create_pipeline_model(
+                model_name=model_params.model_name,
+                n_comp=model_params.pca_n_components,
+                params=model_params.params,
+            )
             # Train the model
-            if model_params.model_name == "RandomForestClassifier":
-                model = _train_model_rf(x_train, y_train, model_params.params)
-            elif model_params.model_name == "HistGradientBoosting":
-                model = _train_model_hgbm(x_train, y_train, model_params.params)
+            pipe = _train_model_pipeline(pipe, x_train, y_train)
             # y_pred_train = model.predict(x_train)
-            y_pred_valid = model.predict(x_valid)
+            y_pred_valid = pipe.predict(x_valid)
 
             # Analyze the model performance
             accuracies.append(accuracy_score(y_true=y_valid, y_pred=y_pred_valid))
@@ -199,7 +224,7 @@ def train_model_cross_validate(
         mlflow.log_metrics(metrics)
 
         # Log the model
-        mlflow.sklearn.log_model(model, name="model", input_example=x_train.sample(5))
+        mlflow.sklearn.log_model(pipe, name="model", input_example=x_train.sample(5))
 
 
 def train_final_model(
