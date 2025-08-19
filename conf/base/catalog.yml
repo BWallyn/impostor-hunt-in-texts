@@ -46,3 +46,13 @@ df_test_features:
   metadata:
     kedro-viz:
       layer: "feature_engineering"
+
+
+# ==== Model training ====
+
+run_id:
+  type: pickle.PickleDataset
+  filepath: data/06_models/model_run_id.pkl
+  metadata:
+    kedro-viz:
+      layer: "model_training"

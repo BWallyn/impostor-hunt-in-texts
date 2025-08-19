@@ -232,7 +232,7 @@ def train_final_model(
     y_training: pd.Series,
     model_params: ModelParams,
     experiment_id: str,
-) -> None:
+) -> str:
     """
     Train the final model on the entire training set and evaluate it on the test set.
 
@@ -243,17 +243,20 @@ def train_final_model(
         experiment_id (str): The id of the MLflow experiment.
 
     Returns:
-        None
+        (str): The ID of the MLflow run.
     """
     # Set the MLflow run
     tags = {"model_name": "final_model", "model_type": model_params.model_name}
-    with mlflow.start_run(experiment_id=experiment_id, tags=tags):
+    with mlflow.start_run(experiment_id=experiment_id, tags=tags) as run:
+        # Define the model pipeline
+        pipe = _create_pipeline_model(
+            model_name=model_params.model_name,
+            n_comp=model_params.pca_n_components,
+            params=model_params.params,
+        )
         # Train the model
-        if model_params.model_name == "RandomForestClassifier":
-            model = _train_model_rf(x_training, y_training, model_params.params)
-        elif model_params.model_name == "HistGradientBoosting":
-            model = _train_model_hgbm(x_training, y_training, model_params.params)
-        y_pred_training = model.predict(x_training)
+        pipe = _train_model_pipeline(pipe, x_training, y_training)
+        y_pred_training = pipe.predict(x_training)
 
         # Compute metrics
         metrics = {
@@ -267,4 +270,6 @@ def train_final_model(
         mlflow.log_metrics(metrics)
 
         # Log the model
-        mlflow.sklearn.log_model(model, name="model", input_example=x_training.sample(5))
+        mlflow.sklearn.log_model(pipe, name="model", input_example=x_training.sample(5))
+
+    return run.info.run_id
