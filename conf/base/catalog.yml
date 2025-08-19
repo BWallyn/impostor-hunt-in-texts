@@ -56,3 +56,13 @@ model_id:
   metadata:
     kedro-viz:
       layer: "model_training"
+
+
+# ==== Model prediction ====
+
+df_pred_test:
+  type: pandas.CSVDataset
+  filepath: data/07_model_output/submission.csv
+  metadata:
+    kedro-viz:
+      layer: "model_prediction"
