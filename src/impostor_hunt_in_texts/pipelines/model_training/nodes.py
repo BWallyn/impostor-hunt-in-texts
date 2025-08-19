@@ -232,7 +232,7 @@ def train_final_model(
     y_training: pd.Series,
     model_params: ModelParams,
     experiment_id: str,
-) -> None:
+) -> str:
     """
     Train the final model on the entire training set and evaluate it on the test set.
 
@@ -243,11 +243,11 @@ def train_final_model(
         experiment_id (str): The id of the MLflow experiment.
 
     Returns:
-        None
+        (str): The ID of the MLflow run.
     """
     # Set the MLflow run
     tags = {"model_name": "final_model", "model_type": model_params.model_name}
-    with mlflow.start_run(experiment_id=experiment_id, tags=tags):
+    with mlflow.start_run(experiment_id=experiment_id, tags=tags) as run:
         # Train the model
         if model_params.model_name == "RandomForestClassifier":
             model = _train_model_rf(x_training, y_training, model_params.params)
@@ -268,3 +268,5 @@ def train_final_model(
 
         # Log the model
         mlflow.sklearn.log_model(model, name="model", input_example=x_training.sample(5))
+
+    return run.info.run_id
