@@ -23,8 +23,8 @@ class ModelParams(BaseModel):
         description="Number of components to get from the PCA.",
         frozen=True,
     )
-    params: dict[str, Any] = Field(
+    search_params: dict[dict[str, Any]] = Field(
         default_factory=dict,
-        description="Parameters for the model. The parameters depend on the model type.",
-        frozen=True
+        description="The search parameters space for the bayesian optimization.",
+        frozen=True,
     )
