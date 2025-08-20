@@ -272,4 +272,7 @@ def train_final_model(
         # Log the model
         model = mlflow.sklearn.log_model(pipe, name="model", input_example=x_training.sample(5))
 
+        # Log the parameters
+        mlflow.log_params(pipe.get_params())
+
     return model.model_id
