@@ -15,7 +15,8 @@ model_training.label_column: "id"
 # Parameters for the Random forest model
 model_training.model_name: "RandomForestClassifier"
 model_training.pca_n_components: 20
-model_training.search_params:
+model_training.n_trials: 50
+model_training.search_space:
   n_estimators: 
     min: 10
     max: 1000
