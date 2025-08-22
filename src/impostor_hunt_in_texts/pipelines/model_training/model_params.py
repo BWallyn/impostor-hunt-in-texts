@@ -2,7 +2,7 @@
 # ==== IMPORTS ====
 # =================
 
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, StrictInt, StrictStr
 
@@ -21,6 +21,11 @@ class ModelParams(BaseModel):
     pca_n_components: StrictInt = Field(
         ge=1,
         description="Number of components to get from the PCA.",
+        frozen=True,
+    )
+    default_hyperparameters: Optional[list[dict[str, Any]]] = Field(
+        default=None,
+        description="Default hyperparameters to try during the bayesian optimization.",
         frozen=True,
     )
     search_params: dict[str, dict[str, Any]] = Field(
