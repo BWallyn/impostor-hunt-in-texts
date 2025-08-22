@@ -12,7 +12,7 @@ from impostor_hunt_in_texts.pipelines.model_training.nodes import (
     initialize_model_params,
     split_data_labels,
     train_final_model,
-    train_model_cross_validate,
+    train_model_bayesian_opti_cross_val,
     validate_params,
 )
 
@@ -29,7 +29,8 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "experiment_id_saved": "params:experiment_id_saved",
                     "model_name": "params:model_name",
                     "model_pca_n_components": "params:pca_n_components",
-                    "model_params": "params:model_params",
+                    "n_trials": "params:n_trials",
+                    "search_space": "params:search_space",
                     "label_column": "params:label_column",
                 },
                 outputs=None,
@@ -50,7 +51,8 @@ def create_pipeline(**kwargs) -> Pipeline:
                 inputs={
                     "model_name": "params:model_name",
                     "pca_n_components": "params:pca_n_components",
-                    "params": "params:model_params",
+                    "search_space": "params:search_space",
+                    "n_trials": "params:n_trials",
                 },
                 outputs="model_params",
                 name="Initialize_model_parameters",
@@ -65,14 +67,14 @@ def create_pipeline(**kwargs) -> Pipeline:
                 name="Split_data_labels_training",
             ),
             Node(
-                func=train_model_cross_validate,
+                func=train_model_bayesian_opti_cross_val,
                 inputs={
                     "x_training": "x_training",
                     "y_training": "y_training",
                     "model_params": "model_params",
                     "experiment_id": "experiment_id",
                 },
-                outputs=None,
+                outputs="best_params",
                 name="Train_model_using_cross_validation",
             ),
             Node(
@@ -81,6 +83,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "x_training": "x_training",
                     "y_training": "y_training",
                     "model_params": "model_params",
+                    "best_params": "best_params",
                     "experiment_id": "experiment_id",
                 },
                 outputs="model_id",

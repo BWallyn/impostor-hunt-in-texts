@@ -38,8 +38,12 @@ class ValidateParams(BaseModel):
         description="Number of components to get from the PCA.",
         frozen=True,
     )
-    model_params: dict[str, Any] = Field(
-        description="Parameters for the model.",
+    n_trials: StrictInt = Field(
+        description="Number of trials for the bayesian optimization.",
+        frozen=True,
+    )
+    search_space: dict[str, dict[str, Any]] = Field(
+        description="Search space of the hyperparameters for the model.",
         frozen=True,
     )
     label_column: StrictStr = Field(
