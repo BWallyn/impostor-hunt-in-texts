@@ -8,7 +8,7 @@ generated using Kedro 1.0.0
 
 import logging
 from functools import partial
-from typing import Any
+from typing import Any, Optional
 
 import mlflow
 import numpy as np
@@ -45,6 +45,7 @@ def validate_params(  # noqa: PLR0913
     model_name: str,
     model_pca_n_components: int,
     n_trials: int,
+    default_hyperparameters: list[dict[str, Any]],
     search_space: dict[str, Any],
     label_column: str,
 ) -> None:
@@ -56,12 +57,19 @@ def validate_params(  # noqa: PLR0913
         model_name=model_name,
         model_pca_n_components=model_pca_n_components,
         n_trials=n_trials,
+        default_hyperparameters=default_hyperparameters,
         search_space=search_space,
         label_column=label_column,
     )
 
 
-def initialize_model_params(model_name: str, pca_n_components: int, search_space: dict[str, Any], n_trials: int) -> ModelParams:
+def initialize_model_params(
+    model_name: str,
+    pca_n_components: int,
+    search_space: dict[str, Any],
+    n_trials: int,
+    default_hyperparameters: Optional[list[dict[str, Any]]] = None,
+) -> ModelParams:
     """
     Initialize the model parameters.
 
@@ -70,6 +78,7 @@ def initialize_model_params(model_name: str, pca_n_components: int, search_space
         pca_n_components (int): The number of components to get from the PCA.
         search_space (dict[str, Any]): The search space of the parameters for the model.
         n_trials (int): Number of trials for the bayesian optimization.
+        default_hyperparameters (Optional[list[dict[str, Any]]]): Default hyperparameters to try during the bayesian optimization.
 
     Returns:
         (ModelParams): The initialized model parameters.
@@ -77,6 +86,7 @@ def initialize_model_params(model_name: str, pca_n_components: int, search_space
     return ModelParams(
         model_name=model_name,
         pca_n_components=pca_n_components,
+        default_hyperparameters=default_hyperparameters,
         search_params=search_space,
         n_trials=n_trials,
     )
@@ -337,7 +347,6 @@ def optimize_hyperparams(  # noqa: PLR0913
     )
 
     # Train model mlflow
-    logger.info(f"Train pipeline model using {optimize_params}")
     _, metrics = _run_cross_validation(
         x_training=x_training,
         y_training=y_training,
@@ -381,6 +390,11 @@ def train_model_bayesian_opti_cross_val(
             direction="maximize",
             sampler=optuna.samplers.TPESampler(multivariate=True, group=True, seed=42)
         )
+
+        # Add default parameters if provided
+        if model_params.default_hyperparameters is not None:
+            for default_params in model_params.default_hyperparameters:
+                study.enqueue_trial(default_params)
 
         # Define objective function
         objective = partial(

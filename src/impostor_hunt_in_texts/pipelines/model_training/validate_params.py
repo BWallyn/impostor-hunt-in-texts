@@ -2,7 +2,7 @@
 # ==== IMPORTS ====
 # =================
 
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, StrictInt, StrictStr
 
@@ -40,6 +40,11 @@ class ValidateParams(BaseModel):
     )
     n_trials: StrictInt = Field(
         description="Number of trials for the bayesian optimization.",
+        frozen=True,
+    )
+    default_hyperparameters: Optional[list[dict[str, Any]]] = Field(
+        default=None,
+        description="Default hyperparameters to try during the bayesian optimization.",
         frozen=True,
     )
     search_space: dict[str, dict[str, Any]] = Field(
