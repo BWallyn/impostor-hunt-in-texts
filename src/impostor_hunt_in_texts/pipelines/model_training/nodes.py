@@ -44,6 +44,7 @@ def validate_params(  # noqa: PLR0913
     experiment_id_saved: str,
     model_name: str,
     model_pca_n_components: int,
+    n_trials: int,
     search_space: dict[str, Any],
     label_column: str,
 ) -> None:
@@ -54,6 +55,7 @@ def validate_params(  # noqa: PLR0913
         experiment_id_saved=experiment_id_saved,
         model_name=model_name,
         model_pca_n_components=model_pca_n_components,
+        n_trials=n_trials,
         search_space=search_space,
         label_column=label_column,
     )
