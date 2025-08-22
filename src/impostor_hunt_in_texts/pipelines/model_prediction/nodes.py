@@ -14,6 +14,7 @@ from sklearn.pipeline import Pipeline
 # ==== FUNCTIONS ====
 # ===================
 
+
 def load_model(model_id: str) -> Pipeline:
     """
     Load the trained model from MLflow.
@@ -42,7 +43,8 @@ def _make_prediction(model: Pipeline, df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_predictions_df(
-    model: Pipeline, df: pd.DataFrame,
+    model: Pipeline,
+    df: pd.DataFrame,
 ) -> pd.DataFrame:
     """
     Create a DataFrame with predictions.
@@ -55,7 +57,9 @@ def create_predictions_df(
         (pd.DataFrame): DataFrame with predictions.
     """
     predictions = _make_prediction(model, df)
-    return pd.DataFrame({
-        "id": df["id"],
-        "real_text_id": predictions,
-    })
+    return pd.DataFrame(
+        {
+            "id": df["id"],
+            "real_text_id": predictions,
+        }
+    )

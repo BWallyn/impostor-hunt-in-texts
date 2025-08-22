@@ -9,7 +9,7 @@ def register_pipelines() -> dict[str, Pipeline]:
     """
     Register the project's pipelines.
 
-    Returns
+    Returns:
         A mapping from pipeline names to ``Pipeline`` objects.
     """
     pipelines = find_pipelines()
