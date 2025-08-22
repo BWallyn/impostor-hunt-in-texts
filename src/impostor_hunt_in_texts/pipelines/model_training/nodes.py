@@ -306,11 +306,11 @@ def _build_search_space(
 
 def optimize_hyperparams(  # noqa: PLR0913
     trial: Trial,
-    search_params: dict[str, Any],
     experiment_id: str,
     run_id: str,
     x_training: pd.DataFrame,
     y_training: pd.Series,
+    model_params: ModelParams,
 ) -> float:
     """
     Optimize the hyperparameters using Bayesian Optimization with Optuna.
@@ -322,16 +322,16 @@ def optimize_hyperparams(  # noqa: PLR0913
         trial (Trial): Trial for bayesian optimization
         experiment_id (str): Id of the MLflow experiment
         run_id (str): Id of the MLflow run
-        search_params (dict[str, Any]): Search parameters for the hyperparameters
         x_training (pd.DataFrame): The training features.
         y_training (pd.Series): The target labels.
+        model_params (ModelParams): The parameters for the model creation and bayesian optimization.
 
     Returns:
         rmse_valid (float): Root Mean Squared Error on the validation set
     """
     optimize_params = _build_search_space(
         trial=trial,
-        search_params=search_params,
+        search_params=model_params.search_params,
     )
 
     # Train model mlflow
@@ -341,7 +341,9 @@ def optimize_hyperparams(  # noqa: PLR0913
         y_training=y_training,
         experiment_id=experiment_id,
         parent_run_id=run_id,
-        **optimize_params,
+        model_name=model_params.model_name,
+        pca_n_components=model_params.pca_n_components,
+        params=optimize_params,
     )
     logger.info(f"Pipeline model trained with f1-score: {metrics["f1_score_valid"]}")
     # Add the best iteration as an attribute
@@ -383,9 +385,9 @@ def train_model_bayesian_opti_cross_val(
             optimize_hyperparams,
             experiment_id=experiment_id,
             run_id=parent_run.info.run_id,
-            search_params=model_params.search_params,
             x_training=x_training,
             y_training=y_training,
+            model_params=model_params,
         )
 
         # Optimize
