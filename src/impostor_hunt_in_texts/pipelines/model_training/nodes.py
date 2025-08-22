@@ -347,7 +347,7 @@ def optimize_hyperparams(  # noqa: PLR0913
         pca_n_components=model_params.pca_n_components,
         params=optimize_params,
     )
-    logger.info(f"Pipeline model trained with f1-score: {metrics["f1_score_valid"]}")
+    logger.info(f"Pipeline model trained with f1-score: {metrics['f1_score_valid']}")
     # Add the best iteration as an attribute
     # trial.set_user_attr("best_iter", model.get_best_iteration())
     return metrics["f1_score_valid"]
