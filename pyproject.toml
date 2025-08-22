@@ -87,6 +87,10 @@ exclude_lines = [ "pragma: no cover", "raise NotImplementedError",]
 [tool.ruff.format]
 docstring-code-format = true
 
+[tool.ruff.lint.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"
+
 [tool.setuptools.dynamic.version]
 attr = "impostor_hunt_in_texts.__version__"
 
