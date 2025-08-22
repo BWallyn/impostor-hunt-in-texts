@@ -341,7 +341,6 @@ def optimize_hyperparams(  # noqa: PLR0913
         y_training=y_training,
         experiment_id=experiment_id,
         parent_run_id=run_id,
-        verbose=100,
         **optimize_params,
     )
     logger.info(f"Pipeline model trained with f1-score: {metrics["f1_score_valid"]}")
