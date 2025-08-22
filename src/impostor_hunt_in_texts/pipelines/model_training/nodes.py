@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 # ==== FUNCTIONS ====
 # ===================
 
+
 def validate_params(  # noqa: PLR0913
     experiment_folder_path: str,
     experiment_name: str,
@@ -92,7 +93,9 @@ def initialize_model_params(
     )
 
 
-def split_data_labels(df: pd.DataFrame, label_column: str) -> tuple[pd.DataFrame, pd.Series]:
+def split_data_labels(
+    df: pd.DataFrame, label_column: str
+) -> tuple[pd.DataFrame, pd.Series]:
     """
     Split the DataFrame into features and labels.
 
@@ -106,7 +109,9 @@ def split_data_labels(df: pd.DataFrame, label_column: str) -> tuple[pd.DataFrame
     return df.drop(columns=[label_column]), df[label_column]
 
 
-def _create_pipeline_model(model_name: str, n_comp: int, params: dict[str, Any]) -> Pipeline:
+def _create_pipeline_model(
+    model_name: str, n_comp: int, params: dict[str, Any]
+) -> Pipeline:
     """
     Create scikit-learn pipeline with PCA and a classifier.
 
@@ -133,7 +138,9 @@ def _create_pipeline_model(model_name: str, n_comp: int, params: dict[str, Any])
 
 
 def _train_model_pipeline(
-    pipe: Pipeline, df: pd.DataFrame, labels: pd.Series,
+    pipe: Pipeline,
+    df: pd.DataFrame,
+    labels: pd.Series,
 ) -> Pipeline:
     """
     Train a scikit-learn pipeline.
@@ -238,8 +245,12 @@ def _run_cross_validation(  # noqa: PLR0913
         metrics (dict[str, float]): The metrics computed during cross-validation.
     """
     # Set the MLflow nested run
-    logger.info(f"Train pipeline model using {model_name} with parameters {params} and with {pca_n_components} PCA components.")
-    with mlflow.start_run(experiment_id=experiment_id, nested=True, parent_run_id=parent_run_id):
+    logger.info(
+        f"Train pipeline model using {model_name} with parameters {params} and with {pca_n_components} PCA components."
+    )
+    with mlflow.start_run(
+        experiment_id=experiment_id, nested=True, parent_run_id=parent_run_id
+    ):
         # Define the folds using stratify to maintain class distribution
         kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
@@ -383,12 +394,11 @@ def train_model_bayesian_opti_cross_val(
     """
     # Set the MLflow run
     with mlflow.start_run(experiment_id=experiment_id) as parent_run:
-
         # Run Bayesian optimization to find the best hyperparameters
         study = optuna.create_study(
             study_name="",
             direction="maximize",
-            sampler=optuna.samplers.TPESampler(multivariate=True, group=True, seed=42)
+            sampler=optuna.samplers.TPESampler(multivariate=True, group=True, seed=42),
         )
 
         # Add default parameters if provided
@@ -407,7 +417,9 @@ def train_model_bayesian_opti_cross_val(
         )
 
         # Optimize
-        study.optimize(objective, n_trials=model_params.n_trials, show_progress_bar=True)
+        study.optimize(
+            objective, n_trials=model_params.n_trials, show_progress_bar=True
+        )
         logger.info(f"Best parameters found: {study.best_params}")
 
     # Get best parameters
@@ -454,8 +466,12 @@ def train_final_model(
 
         # Compute metrics
         metrics = {
-            "accuracy_training": accuracy_score(y_true=y_training, y_pred=y_pred_training),
-            "precision_training": precision_score(y_true=y_training, y_pred=y_pred_training),
+            "accuracy_training": accuracy_score(
+                y_true=y_training, y_pred=y_pred_training
+            ),
+            "precision_training": precision_score(
+                y_true=y_training, y_pred=y_pred_training
+            ),
             "recall_training": recall_score(y_true=y_training, y_pred=y_pred_training),
             "f1_score_training": f1_score(y_true=y_training, y_pred=y_pred_training),
         }
@@ -464,7 +480,9 @@ def train_final_model(
         mlflow.log_metrics(metrics)
 
         # Log the model
-        model = mlflow.sklearn.log_model(pipe, name="model", input_example=x_training.sample(5))
+        model = mlflow.sklearn.log_model(
+            pipe, name="model", input_example=x_training.sample(5)
+        )
 
         # Log the parameters
         mlflow.log_params(pipe.get_params())

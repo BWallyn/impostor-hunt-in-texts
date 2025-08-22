@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, StrictStr
 # ==== CLASS ====
 # ===============
 
+
 class ValidateParams(BaseModel):
     """Class to validate the input parameters of the prepare_data pipeline."""
 

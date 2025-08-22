@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field, StrictInt, StrictStr
 # ==== CLASS ====
 # ===============
 
+
 class ValidateParams(BaseModel):
     """Class to validate the input parameters of the feature_engineering pipeline."""
 
@@ -53,5 +54,5 @@ class ValidateParams(BaseModel):
     )
     label_column: StrictStr = Field(
         pattern=r"^[A-Za-z0-9\_]+$",
-        description="Name of the column containing the labels."
+        description="Name of the column containing the labels.",
     )

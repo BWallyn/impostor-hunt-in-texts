@@ -17,7 +17,7 @@ def create_pipeline(**kwargs) -> Pipeline:
         nodes=[
             Node(
                 func=validate_input_params,
-                inputs= {
+                inputs={
                     "path_data_train": "params:path_data_train",
                     "path_data_test": "params:path_data_test",
                     "path_dataset_dict": "params:path_dataset_dict",

@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field, StrictInt, StrictStr
 # ==== CLASS ====
 # ===============
 
+
 class ModelParams(BaseModel):
     """Class to store the model parameters."""
 

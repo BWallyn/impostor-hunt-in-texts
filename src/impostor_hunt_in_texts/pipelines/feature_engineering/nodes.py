@@ -21,6 +21,7 @@ from impostor_hunt_in_texts.pipelines.feature_engineering.validate_params import
 # ==== FUNCTIONS ====
 # ===================
 
+
 def validate_input_params(
     hf_model_name: str,
     max_length: int,
@@ -36,7 +37,9 @@ def validate_input_params(
     )
 
 
-def load_model_and_tokenizer(model_name: str) -> tuple[transformers.PreTrainedModel, transformers.PreTrainedTokenizer]:
+def load_model_and_tokenizer(
+    model_name: str,
+) -> tuple[transformers.PreTrainedModel, transformers.PreTrainedTokenizer]:
     """
     Load a pre-trained model and tokenizer from Hugging Face.
 
@@ -54,7 +57,7 @@ def load_model_and_tokenizer(model_name: str) -> tuple[transformers.PreTrainedMo
 
 def _extract_mean_pooling_vector(  # noqa: PLR0913
     text: str,
-    tokenizer : transformers.PreTrainedTokenizer,
+    tokenizer: transformers.PreTrainedTokenizer,
     model,
     max_length: int = 512,
     stride: int = 256,
@@ -81,7 +84,7 @@ def _extract_mean_pooling_vector(  # noqa: PLR0913
         max_length=max_length,
         stride=stride,
         return_overflowing_tokens=True,
-        padding="max_length"
+        padding="max_length",
     )
 
     input_ids_chunks = encoded_text["input_ids"]
@@ -99,7 +102,9 @@ def _extract_mean_pooling_vector(  # noqa: PLR0913
             attention_mask = attention_mask.unsqueeze(0).to(device)  # noqa: PLW2901
 
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
-            last_hidden_state = outputs.last_hidden_state  # shape: [1, seq_len, hidden_dim]
+            last_hidden_state = (
+                outputs.last_hidden_state
+            )  # shape: [1, seq_len, hidden_dim]
 
             # Apply mean pooling (excluding padded tokens)
             mask = attention_mask.unsqueeze(-1).expand(last_hidden_state.size())
@@ -143,8 +148,12 @@ def extract_features(  # noqa: PLR0913
     ids = []
 
     for row in tqdm(dataset, desc="Extracting features"):
-        vec1 = _extract_mean_pooling_vector(row['text1'], tokenizer, model, max_length, stride, device)
-        vec2 = _extract_mean_pooling_vector(row['text2'], tokenizer, model, max_length, stride, device)
+        vec1 = _extract_mean_pooling_vector(
+            row["text1"], tokenizer, model, max_length, stride, device
+        )
+        vec2 = _extract_mean_pooling_vector(
+            row["text2"], tokenizer, model, max_length, stride, device
+        )
 
         # Compute interaction vectors
         diff = vec1 - vec2
@@ -153,12 +162,14 @@ def extract_features(  # noqa: PLR0913
         # Concatenate all parts
         final_vec = torch.cat([vec1, vec2, diff, prod])
         features.append(final_vec.numpy())
-        ids.append(row['id'])
+        ids.append(row["id"])
 
     return np.array(features), ids
 
 
-def convert_features_to_dataframe(dataset_features: np.ndarray, ids: list[int]) -> pd.DataFrame:
+def convert_features_to_dataframe(
+    dataset_features: np.ndarray, ids: list[int]
+) -> pd.DataFrame:
     """
     Convert the features extracted from the texts to a pandas DataFrame.
 
@@ -169,7 +180,13 @@ def convert_features_to_dataframe(dataset_features: np.ndarray, ids: list[int]) 
     Returns:
         (pd.DataFrame): A DataFrame containing the features with columns for each feature and the ids.
     """
-    return pd.concat([
-        pd.DataFrame({"id": ids}),
-        pd.DataFrame(dataset_features, columns=[f"token_feat_{i}" for i in range(dataset_features.shape[1])]),
-    ], axis=1)
+    return pd.concat(
+        [
+            pd.DataFrame({"id": ids}),
+            pd.DataFrame(
+                dataset_features,
+                columns=[f"token_feat_{i}" for i in range(dataset_features.shape[1])],
+            ),
+        ],
+        axis=1,
+    )
