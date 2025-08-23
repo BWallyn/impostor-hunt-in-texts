@@ -17,27 +17,55 @@ model_training.pca_n_components: 20
 model_training.n_trials: 50
 
 # Parameters for the Random forest model
-model_training.model_name: "RandomForestClassifier"
+# model_training.model_name: "RandomForestClassifier"
+# model_training.default_hyperparameters: [
+#   {
+#     "n_estimators": 100,
+#     "min_samples_split": 2,
+#     "max_features": "sqrt",
+#   },
+# ]
+# model_training.search_space:
+#   n_estimators: 
+#     min: 10
+#     max: 1000
+#     sampling_type: "int"
+#   max_depth:
+#     min: 2
+#     max: 10
+#     sampling_type: "int"
+#   min_samples_split:
+#     min: 2
+#     max: 10
+#     sampling_type: "int"
+#   max_features:
+#     choices: ["sqrt", "log2"]
+#     sampling_type: "categorical"
+
+# Parameters for the Hist Gradient Boosting model
+model_training.model_name: "HistGradientBoostingClassifier"
 model_training.default_hyperparameters: [
   {
-    "n_estimators": 100,
-    "min_samples_split": 2,
-    "max_features": "sqrt",
+    "learning_rate": 0.1,
+    "max_iter": 100,
+    "max_leaf_nodes": 31,
+    "l2_regularization": 0.0,
   },
 ]
 model_training.search_space:
-  n_estimators: 
-    min: 10
+  learning_rate:
+    min: 0.01
+    max: 0.5
+    sampling_type: "float"
+  max_iter:
+    min: 50
     max: 1000
     sampling_type: "int"
-  max_depth:
-    min: 2
-    max: 10
+  max_leaf_nodes:
+    min: 10
+    max: 50
     sampling_type: "int"
-  min_samples_split:
-    min: 2
-    max: 10
-    sampling_type: "int"
-  max_features:
-    choices: ["sqrt", "log2"]
-    sampling_type: "categorical"
+  l2_regularization:
+    min: 0.0
+    max: 0.7
+    sampling_type: "float"
