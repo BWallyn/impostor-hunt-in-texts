@@ -6,26 +6,12 @@ generated using Kedro 1.0.0
 # ==== IMPORTS ====
 # =================
 
-import mlflow
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
 # ===================
 # ==== FUNCTIONS ====
 # ===================
-
-
-def load_model(model_id: str) -> Pipeline:
-    """
-    Load the trained model from MLflow.
-
-    Args:
-        model_id (str): The ID of the model in MLflow.
-
-    Returns:
-        (Pipeline): The loaded model pipeline.
-    """
-    return mlflow.pyfunc.load_model(f"models:/{model_id}")
 
 
 def _make_prediction(model: Pipeline, df: pd.DataFrame) -> pd.DataFrame:
