@@ -10,8 +10,8 @@ from typing import Optional
 
 import mlflow
 import pandas as pd
-from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import Pipeline
 
 # ===================
 # ==== FUNCTIONS ====
