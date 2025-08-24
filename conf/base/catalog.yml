@@ -57,6 +57,13 @@ model_id:
     kedro-viz:
       layer: "model_training"
 
+run_id:
+  type: pickle.PickleDataset
+  filepath: data/06_models/run_id.pkl
+  metadata:
+    kedro-viz:
+      layer: "model_training"
+
 
 # ==== Model prediction ====
 
