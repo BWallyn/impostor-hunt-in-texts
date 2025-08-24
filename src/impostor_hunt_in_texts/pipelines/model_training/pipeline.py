@@ -88,11 +88,11 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "best_params": "best_params",
                     "experiment_id": "experiment_id",
                 },
-                outputs="model_id",
+                outputs=["model_id", "run_id"],
                 name="Train_final_model",
             ),
         ],
         namespace="model_training",
         inputs="df_train_features",
-        outputs="model_id",
+        outputs=["model_id", "run_id"],
     )
