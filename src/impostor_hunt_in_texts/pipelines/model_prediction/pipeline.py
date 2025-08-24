@@ -7,8 +7,8 @@ from kedro.pipeline import Node, Pipeline
 
 from impostor_hunt_in_texts.pipelines.model_prediction.nodes import (
     create_predictions_df,
-    load_model,
 )
+from impostor_hunt_in_texts.utils.utils_model import load_model
 
 
 def create_pipeline(**kwargs) -> Pipeline:
