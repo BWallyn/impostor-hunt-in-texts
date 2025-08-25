@@ -6,6 +6,7 @@ generated using Kedro 1.0.0
 from kedro.pipeline import Node, Pipeline
 
 from impostor_hunt_in_texts.pipelines.feature_engineering.nodes import (
+    augment_data,
     convert_features_to_dataframe,
     extract_features,
     load_model_and_tokenizer,
@@ -42,6 +43,12 @@ def create_pipeline(**kwargs) -> Pipeline:
                 name="Split_dataset_dict",
             ),
             Node(
+                func=augment_data,
+                inputs={"dataset": "dataset_train"},
+                outputs="dataset_train_augmented",
+                name="Augment_dataset_train",
+            ),
+            Node(
                 func=load_model_and_tokenizer,
                 inputs={"model_name": "params:hf_model_name"},
                 outputs=["model", "tokenizer"],
@@ -50,7 +57,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             Node(
                 func=extract_features,
                 inputs={
-                    "dataset": "dataset_train",
+                    "dataset": "dataset_train_augmented",
                     "tokenizer": "tokenizer",
                     "model": "model",
                     "max_length": "params:max_length",
