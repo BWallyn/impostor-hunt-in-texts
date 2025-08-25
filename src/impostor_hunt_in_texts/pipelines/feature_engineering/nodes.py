@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import torch
 import transformers
-from datasets import Dataset
+from datasets import Dataset, concatenate_datasets
 from tqdm import tqdm
 
 from impostor_hunt_in_texts.pipelines.feature_engineering.validate_params import (
@@ -53,6 +53,21 @@ def load_model_and_tokenizer(
         transformers.AutoModel.from_pretrained(model_name),
         transformers.AutoTokenizer.from_pretrained(model_name),
     )
+
+
+def augment_data(dataset: Dataset) -> Dataset:
+    """Perform data augmentation by swaping places of texts.
+
+    Args:
+        dataset (Dataset): The dataset containing text pairs.
+
+    Returns:
+        (Dataset): The dataset with data augmentation.
+    """
+    dataset_swap = dataset.copy()
+    dataset_swap["text_1"], dataset_swap["text_2"] = dataset_swap["text_2"], dataset_swap["text_1"]
+    dataset_swap["id"] = 1 - dataset_swap["id"]
+    return concatenate_datasets([dataset, dataset_swap], axis=0)
 
 
 def _extract_mean_pooling_vector(  # noqa: PLR0913
