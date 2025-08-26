@@ -6,11 +6,15 @@ generated using Kedro 1.0.0
 # ==== IMPORTS ====
 # =================
 
+import re
+import unicodedata
+
 import numpy as np
 import pandas as pd
 import torch
 import transformers
 from datasets import Dataset
+from nltk.tokenize import sent_tokenize, word_tokenize
 from tqdm import tqdm
 
 from impostor_hunt_in_texts.pipelines.feature_engineering.validate_params import (
@@ -190,3 +194,35 @@ def convert_features_to_dataframe(
         ],
         axis=1,
     )
+
+
+def _extract_text_info(text: str):
+    """Extract information from the text.
+
+    Args:
+        text (str): The text from which info is extracted.
+
+    Returns:
+        features (dict): A dictionary containing the extracted features.
+    """
+    text = re.sub(r"\s+", " ", text).strip()
+    words = word_tokenize(text)
+    sentences = sent_tokenize(text)
+    features = {
+        "char_count": len(text),
+        "word_count": len(words),
+        "sentence_count": len(sentences),
+        "avg_word_length": np.mean([len(word) for word in words]),
+    }
+    non_space_chars = list(re.findall(r"\S", text))
+    if non_space_chars:
+        latin_chars = [c for c in non_space_chars if 'LATIN' in unicodedata.name(c, '')]
+        features["latin_ratio"] = len(latin_chars) / len(non_space_chars)
+    else:
+        features["latin_ratio"] = 0.0
+    return features
+
+
+def create_differential_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Create differential features between text 1 and text 2."""
+    pass
