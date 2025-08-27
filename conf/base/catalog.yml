@@ -10,3 +10,66 @@ df_train:
   filepath: data/01_raw/train.csv
   load_args:
     sep: ","
+  metadata:
+    kedro-viz:
+      layer: "prepare_data"
+
+# dataset_train:
+#   type: kedro_hf_datasets.HFDataset
+#   filepath: data/02_intermediate/dataset_train.HFDataset
+
+
+# dataset_test:
+#   type: kedro_hf_datasets.HFDataset
+#   filepath: data/02_intermediate/dataset_train.HFDataset
+
+dict_metadata_datasets:
+  type: pickle.PickleDataset
+  filepath: data/02_intermediate/dict_metadata_datasets.pkl
+  metadata:
+    kedro-viz:
+      layer: "prepare_data"
+
+
+# ==== Feature engineering ====
+
+df_train_features:
+  type: pandas.ParquetDataset
+  filepath: data/05_model_input/df_train_features.parquet
+  metadata:
+    kedro-viz:
+      layer: "feature_engineering"
+
+df_test_features:
+  type: pandas.ParquetDataset
+  filepath: data/05_model_input/df_test_features.parquet
+  metadata:
+    kedro-viz:
+      layer: "feature_engineering"
+
+
+# ==== Model training ====
+
+model_id:
+  type: pickle.PickleDataset
+  filepath: data/06_models/model_id.pkl
+  metadata:
+    kedro-viz:
+      layer: "model_training"
+
+run_id:
+  type: pickle.PickleDataset
+  filepath: data/06_models/run_id.pkl
+  metadata:
+    kedro-viz:
+      layer: "model_training"
+
+
+# ==== Model prediction ====
+
+df_pred_test:
+  type: pandas.CSVDataset
+  filepath: data/07_model_output/submission.csv
+  metadata:
+    kedro-viz:
+      layer: "model_prediction"

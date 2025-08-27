@@ -11,11 +11,17 @@ dependencies = [
  "ipython>=8.10",
  "jupyterlab>=3.0",
  "notebook",
- "kedro~=0.19.12",
+ "kedro>=1.0",
  "catboost>=1.2.8",
  "datasets>=4.0.0",
- "kedro-viz>=11.1.0",
+ "kedro-viz>=12.0.0",
  "kedro-datasets[matplotlib-matplotlibwriter,pandas-csvdataset,pandas-exceldataset,pandas-parquetdataset,plotly-jsondataset,plotly-plotlydataset]>=4.1.0",
+ "transformers>=4.55.0",
+ "torch",
+ "pydantic>=2.11.7",
+ "scikit-learn>=1.6.1",
+ "mlflow>=3.1.4",
+ "optuna>=4.5.0",
 ]
 
 [project.scripts]
@@ -27,7 +33,7 @@ dev = [ "pytest-cov~=3.0", "pytest-mock>=1.7.1, <2.0", "pytest~=7.2", "ruff~=0.1
 [tool.kedro]
 package_name = "impostor_hunt_in_texts"
 project_name = "impostor-hunt-in-texts"
-kedro_init_version = "0.19.12"
+kedro_init_version = "1.0.0"
 tools = "['Linting', 'Testing', 'Data Structure']"
 example_pipeline = "False"
 source_dir = "src"
@@ -56,7 +62,9 @@ lint.ignore = [
     "E501", # line too long
     "D100", # missing docstring
     "D104", # missing docstring in public package
+    "D203", # One blank line before class docstring
     "D205", # blank line between summary and description
+    "D212", # Multi-line docstring summary should start at the second line
     "D400", # first line should end with a period, question mark or exclamation point
     "D404", # first word of the docstring should not be "This"
     "D407", # Missing dashed underline after section
@@ -78,6 +86,10 @@ exclude_lines = [ "pragma: no cover", "raise NotImplementedError",]
 
 [tool.ruff.format]
 docstring-code-format = true
+
+[tool.ruff.lint.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"
 
 [tool.setuptools.dynamic.version]
 attr = "impostor_hunt_in_texts.__version__"

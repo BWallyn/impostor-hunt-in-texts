@@ -163,3 +163,9 @@ mlruns/*
 
 # UV
 uv.lock
+
+# VS Code
+.vscode/settings.json
+
+# MLflow
+mlflow_experiments/
