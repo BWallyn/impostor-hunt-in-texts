@@ -6,6 +6,8 @@ generated using Kedro 1.0.0
 # ==== IMPORTS ====
 # =================
 
+import copy
+
 import numpy as np
 import pandas as pd
 import torch
@@ -64,10 +66,13 @@ def augment_data(dataset: Dataset) -> Dataset:
     Returns:
         (Dataset): The dataset with data augmentation.
     """
-    dataset_swap = dataset.copy()
-    dataset_swap["text_1"], dataset_swap["text_2"] = dataset_swap["text_2"], dataset_swap["text_1"]
-    dataset_swap["id"] = 1 - dataset_swap["id"]
-    return concatenate_datasets([dataset, dataset_swap], axis=0)
+    text1, text2 = dataset["text1"], dataset["text2"]
+    id_text = dataset.add_column("id", np.ones(len(text1)) - np.array(dataset["id"]))
+    return Dataset.from_dict({
+        "text1": text2,
+        "text2": text1,
+        "id": id_text,
+    })
 
 
 def _extract_mean_pooling_vector(  # noqa: PLR0913
