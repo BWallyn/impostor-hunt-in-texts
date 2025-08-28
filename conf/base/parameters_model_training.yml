@@ -10,7 +10,7 @@ model_training.experiment_name: "impostor_hunt_in_texts"
 model_training.experiment_id_saved: "247466202237108334"
 
 # Parameters to split data
-model_training.label_column: "id"
+model_training.label_column: "real_text_id"
 
 # Parameters for the pipeline
 model_training.pca_n_components: 20
