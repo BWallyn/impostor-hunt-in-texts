@@ -6,6 +6,8 @@ generated using Kedro 1.0.0
 # ==== IMPORTS ====
 # =================
 
+import logging
+
 import numpy as np
 import pandas as pd
 import torch
@@ -16,6 +18,9 @@ from tqdm import tqdm
 from impostor_hunt_in_texts.pipelines.feature_engineering.validate_params import (
     ValidateParams,
 )
+
+# Options
+logger = logging.getLogger(__name__)
 
 # ===================
 # ==== FUNCTIONS ====
@@ -183,12 +188,13 @@ def extract_features(  # noqa: PLR0913
         final_vec = torch.cat([vec1, vec2, diff, prod])
         features.append(final_vec.numpy())
         ids.append(row["id"])
-        if "real_text_ids" in row:
+        if "real_text_id" in row:
             real_text_ids.append(row["real_text_id"])
 
     if len(real_text_ids) > 0:
         df_ids = pd.DataFrame({"id": ids, "real_text_id": real_text_ids})
     else:
+        logger.warning("The real_text_id column is not present in the dataset.")
         df_ids = pd.DataFrame({"id": ids})
     return np.array(features), df_ids
 
