@@ -3,6 +3,7 @@
 # ==== IMPORTS ====
 # =================
 
+import logging
 import os
 import re
 
@@ -10,6 +11,9 @@ import pandas as pd
 from datasets import Dataset, DatasetDict
 
 from impostor_hunt_in_texts.pipelines.prepare_data.validate_params import ValidateParams
+
+# Options
+logger = logging.getLogger(__name__)
 
 # ===================
 # ==== FUNCTIONS ====
@@ -112,7 +116,9 @@ def create_dataset_train(df: pd.DataFrame, path_data: str) -> Dataset:
     Returns:
         (Dataset): A Dataset object containing the training data.
     """
-    return Dataset.from_generator(lambda: _generate_dataset_train(df, path_data))
+    dataset = Dataset.from_generator(lambda: _generate_dataset_train(df, path_data))
+    logger.info("Dataset train column names: %s", dataset.column_names)
+    return dataset
 
 
 def create_dataset_test(path_data: str) -> Dataset:
