@@ -84,7 +84,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                 func=convert_features_to_dataframe,
                 inputs={
                     "dataset_features": "dataset_train_features",
-                    "ids": "train_ids",
+                    "df_ids": "train_ids",
                 },
                 outputs="df_train_features",
                 name="Convert_features_to_dataframe_train",
@@ -93,7 +93,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                 func=convert_features_to_dataframe,
                 inputs={
                     "dataset_features": "dataset_test_features",
-                    "ids": "test_ids",
+                    "df_ids": "test_ids",
                 },
                 outputs="df_test_features",
                 name="Convert_features_to_dataframe_test",
