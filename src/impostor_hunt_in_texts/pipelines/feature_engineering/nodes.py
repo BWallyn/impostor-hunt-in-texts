@@ -70,11 +70,11 @@ def augment_data(dataset: Dataset) -> Dataset:
         (Dataset): The dataset with data augmentation.
     """
     text1, text2 = dataset["text1"], dataset["text2"]
-    real_text_id = 1 - np.array(dataset["real_text_id"])
+    real_text_id = np.ones(len(text1)) * 3 - np.array(dataset["real_text_id"])
     dataset_swap = Dataset.from_dict({
         "text1": text2,
         "text2": text1,
-        "real_text_id": real_text_id,
+        "real_text_id": real_text_id.astype(int),
     })
     return concatenate_datasets([dataset, dataset_swap], axis=0)
 
