@@ -4,6 +4,8 @@
 
 from datasets import Dataset, DatasetDict, load_from_disk
 
+import pandas as pd
+
 # ===================
 # ==== FUNCTIONS ====
 # ===================
@@ -48,3 +50,16 @@ def split_dataset_dict(dataset_dict: DatasetDict) -> tuple[Dataset, Dataset]:
         (tuple[Dataset, Dataaset]): A tuple containing the train and test datasets.
     """
     return dataset_dict["train"], dataset_dict["test"]
+
+
+def drop_columns(df: pd.DataFrame, cols_to_drop: list[str]) -> pd.DataFrame:
+    """Drop specified columns from a pandas DataFrame.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        cols_to_drop (list[str]): List of the columns to drop.
+
+    Returns:
+        (pd.DataFrame): The DataFrame with the specified columns dropped.
+    """
+    return df.drop(columns=cols_to_drop)

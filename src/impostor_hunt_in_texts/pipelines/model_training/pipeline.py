@@ -15,6 +15,7 @@ from impostor_hunt_in_texts.pipelines.model_training.nodes import (
     train_model_bayesian_opti_cross_val,
     validate_params,
 )
+from impostor_hunt_in_texts.utils.utils import drop_columns
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -60,9 +61,18 @@ def create_pipeline(**kwargs) -> Pipeline:
                 name="Initialize_model_parameters",
             ),
             Node(
-                func=split_data_labels,
+                func=drop_columns,
                 inputs={
                     "df": "df_train_features",
+                    "cols_to_drop": "params:id_to_drop",
+                },
+                outputs="df_train_id_droped",
+                name="Drop_id_columns_from_training_data",
+            ),
+            Node(
+                func=split_data_labels,
+                inputs={
+                    "df": "df_train_id_droped",
                     "label_column": "params:label_column",
                 },
                 outputs=["x_training", "y_training"],
