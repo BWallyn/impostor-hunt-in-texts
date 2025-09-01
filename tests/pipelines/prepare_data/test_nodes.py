@@ -19,7 +19,8 @@ from impostor_hunt_in_texts.pipelines.prepare_data.nodes import _generate_datase
 def sample_dataframe():
     """Create a sample DataFrame for testing."""
     return pd.DataFrame({
-        'real_text_id': [1, 2, 3],
+        'id': [1, 2, 3],
+        'real_text_id': [1, 2, 1],
         'other_column': ['a', 'b', 'c']
     })
 
@@ -74,7 +75,7 @@ def test_generate_dataset_train_empty_dataframe(temp_directory):
 
 def test_generate_dataset_train_single_row(temp_directory):
     """Test with single row DataFrame."""
-    single_row_df = pd.DataFrame({'real_text_id': [1]})
+    single_row_df = pd.DataFrame({'id': [1], 'real_text_id': [1]})
     results = list(_generate_dataset_train(single_row_df, temp_directory))
 
     assert len(results) == 1
@@ -119,7 +120,7 @@ def test_generate_dataset_train_nonexistent_path(sample_dataframe):
 def test_generate_dataset_train_unicode_content(temp_directory):
     """Test with Unicode content in files."""
     # Create DataFrame with one row
-    df = pd.DataFrame({'real_text_id': [1]})
+    df = pd.DataFrame({'id': [1], 'real_text_id': [1]})
 
     # Create files with Unicode content
     folder_path = os.path.join(temp_directory, "article_0001")
@@ -136,7 +137,7 @@ def test_generate_dataset_train_unicode_content(temp_directory):
 
 def test_generate_dataset_train_large_ids(temp_directory):
     """Test with large ID numbers to verify zero-padding."""
-    df = pd.DataFrame({'real_text_id': [9999]})
+    df = pd.DataFrame({'id': [9999], 'real_text_id': [9999]})
 
     # Create corresponding directory and files
     folder_path = os.path.join(temp_directory, "article_9999")
@@ -156,7 +157,7 @@ def test_generate_dataset_train_large_ids(temp_directory):
 
 def test_generate_dataset_train_empty_files(temp_directory):
     """Test with empty text files."""
-    df = pd.DataFrame({'real_text_id': [1]})
+    df = pd.DataFrame({'id': [1], 'real_text_id': [1]})
 
     # Create empty files
     folder_path = os.path.join(temp_directory, "article_0001")
