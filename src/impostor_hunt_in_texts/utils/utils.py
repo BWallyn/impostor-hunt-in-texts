@@ -2,9 +2,8 @@
 # ==== IMPORTS ====
 # =================
 
-from datasets import Dataset, DatasetDict, load_from_disk
-
 import pandas as pd
+from datasets import Dataset, DatasetDict, load_from_disk
 
 # ===================
 # ==== FUNCTIONS ====
