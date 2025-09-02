@@ -3,6 +3,7 @@
 # ==== IMPORTS ====
 # =================
 
+import logging
 import os
 import re
 
@@ -10,6 +11,9 @@ import pandas as pd
 from datasets import Dataset, DatasetDict
 
 from impostor_hunt_in_texts.pipelines.prepare_data.validate_params import ValidateParams
+
+# Options
+logger = logging.getLogger(__name__)
 
 # ===================
 # ==== FUNCTIONS ====
@@ -52,7 +56,7 @@ def _generate_dataset_train(df: pd.DataFrame, path_data: str):
         Yield dictionaries of (id, text1, text2).
     """
     for _, row in df.iterrows():
-        folder_id = row["real_text_id"]
+        folder_id = row["id"]
         folder_path = os.path.join(path_data, f"article_{folder_id:04d}")
 
         file1_path = os.path.join(folder_path, "file_1.txt")
@@ -63,7 +67,7 @@ def _generate_dataset_train(df: pd.DataFrame, path_data: str):
         with open(file2_path, encoding="utf-8") as f2:
             text2 = f2.read()
 
-        yield {"id": folder_id, "text1": text1, "text2": text2}
+        yield {"id": folder_id, "text1": text1, "text2": text2, "real_text_id": row["real_text_id"]}
 
 
 def _generate_dataset_test(path_data: str):
@@ -112,7 +116,9 @@ def create_dataset_train(df: pd.DataFrame, path_data: str) -> Dataset:
     Returns:
         (Dataset): A Dataset object containing the training data.
     """
-    return Dataset.from_generator(lambda: _generate_dataset_train(df, path_data))
+    dataset = Dataset.from_generator(lambda: _generate_dataset_train(df, path_data))
+    logger.info("Dataset train column names: %s", dataset.column_names)
+    return dataset
 
 
 def create_dataset_test(path_data: str) -> Dataset:

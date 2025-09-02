@@ -15,8 +15,10 @@ import numpy as np
 import optuna
 import pandas as pd
 from optuna import Trial
+from sklearn.compose import ColumnTransformer
 from sklearn.decomposition import PCA
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
+from sklearn.impute import SimpleImputer
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -110,7 +112,11 @@ def split_data_labels(
 
 
 def _create_pipeline_model(
-    model_name: str, n_comp: int, params: dict[str, Any]
+    model_name: str,
+    n_comp: int,
+    params: dict[str, Any],
+    feat_for_pca: Optional[list[str]] = None,
+    numeric_features: Optional[list[str]] = None,
 ) -> Pipeline:
     """
     Create scikit-learn pipeline with PCA and a classifier.
@@ -119,22 +125,24 @@ def _create_pipeline_model(
         model_name (str): Name of the model to use as a classifier.
         n_comp (int): Number of components to get from the PCA.
         params (dict[str, Any]): Parameters for the model.
+        feat_for_pca (Optional[list[str]]): List of features to apply PCA on.
+        numeric_features (Optional[list[str]]): List of numeric features to apply imputation on.
 
     Returns:
         (Pipeline): The scikit learn pipeline containing a PCA and a classifier.
     """
-    estimators = [
-        ("reduce_dim", PCA(n_components=n_comp)),
-    ]
+    preprocessor = ColumnTransformer([
+        ("reduce_dim", PCA(n_components=n_comp), feat_for_pca),
+        ("simple_imp", SimpleImputer(strategy="mean"), numeric_features),
+    ])
     if model_name == "HistGradientBoostingClassifier":
-        estimators.append(
-            ("classifier", HistGradientBoostingClassifier(**params, random_state=42))
-        )
+        classifier = HistGradientBoostingClassifier(**params, random_state=42)
     elif model_name == "RandomForestClassifier":
-        estimators.append(
-            ("classifier", RandomForestClassifier(**params, random_state=42))
-        )
-    return Pipeline(estimators)
+        classifier = RandomForestClassifier(**params, random_state=42)
+    return Pipeline(steps=[
+        ("preprocessor", preprocessor),
+        ("classifier", classifier),
+    ])
 
 
 def _train_model_pipeline(
@@ -180,6 +188,14 @@ def train_model_cross_validate(
     recalls = []
     f1_scores = []
 
+    # Get features for PCA
+    feat_for_pca = [
+        col for col in x_training.columns if col.startswith("token_feat_")
+    ]
+    numeric_features = [
+        col for col in x_training.columns if not col.startswith("token_feat_")
+    ]
+
     # Set the MLflow run
     with mlflow.start_run(experiment_id=experiment_id):
         # Loop over the folds
@@ -192,6 +208,8 @@ def train_model_cross_validate(
                 model_name=model_params.model_name,
                 n_comp=model_params.pca_n_components,
                 params=model_params.params,
+                feat_for_pca=feat_for_pca,
+                numeric_features=numeric_features,
             )
             # Train the model
             pipe = _train_model_pipeline(pipe, x_train, y_train)
@@ -260,6 +278,14 @@ def _run_cross_validation(  # noqa: PLR0913
         recalls = []
         f1_scores = []
 
+        # Get features for PCA
+        feat_for_pca = [
+            col for col in x_training.columns if col.startswith("token_feat_")
+        ]
+        numeric_features = [
+            col for col in x_training.columns if not col.startswith("token_feat_")
+        ]
+
         # Loop over the folds
         for train_idx, valid_idx in kf.split(x_training, y_training):
             x_train, x_valid = x_training.iloc[train_idx], x_training.iloc[valid_idx]
@@ -270,6 +296,8 @@ def _run_cross_validation(  # noqa: PLR0913
                 model_name=model_name,
                 n_comp=pca_n_components,
                 params=params,
+                feat_for_pca=feat_for_pca,
+                numeric_features=numeric_features,
             )
             # Train the model
             pipe = _train_model_pipeline(pipe, x_train, y_train)
@@ -455,11 +483,20 @@ def train_final_model(
     # Set the MLflow run
     tags = {"model_name": "final_model", "model_type": model_params.model_name}
     with mlflow.start_run(experiment_id=experiment_id, tags=tags) as run:
+        # Get features for PCA
+        feat_for_pca = [
+            col for col in x_training.columns if col.startswith("token_feat_")
+        ]
+        numeric_features = [
+            col for col in x_training.columns if not col.startswith("token_feat_")
+        ]
         # Define the model pipeline
         pipe = _create_pipeline_model(
             model_name=model_params.model_name,
             n_comp=model_params.pca_n_components,
             params=best_params,
+            feat_for_pca=feat_for_pca,
+            numeric_features=numeric_features,
         )
         # Train the model
         pipe = _train_model_pipeline(pipe, x_training, y_training)
