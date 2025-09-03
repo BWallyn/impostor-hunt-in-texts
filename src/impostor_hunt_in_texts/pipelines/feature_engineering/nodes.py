@@ -8,6 +8,7 @@ generated using Kedro 1.0.0
 
 import re
 import unicodedata
+import logging
 
 import numpy as np
 import pandas as pd
@@ -15,11 +16,15 @@ import torch
 import transformers
 from datasets import Dataset
 from nltk.tokenize import sent_tokenize, word_tokenize
+from datasets import Dataset, concatenate_datasets
 from tqdm import tqdm
 
 from impostor_hunt_in_texts.pipelines.feature_engineering.validate_params import (
     ValidateParams,
 )
+
+# Options
+logger = logging.getLogger(__name__)
 
 # ===================
 # ==== FUNCTIONS ====
@@ -57,6 +62,25 @@ def load_model_and_tokenizer(
         transformers.AutoModel.from_pretrained(model_name),
         transformers.AutoTokenizer.from_pretrained(model_name),
     )
+
+
+def augment_data(dataset: Dataset) -> Dataset:
+    """Perform data augmentation by swaping places of texts.
+
+    Args:
+        dataset (Dataset): The dataset containing text pairs.
+
+    Returns:
+        (Dataset): The dataset with data augmentation.
+    """
+    text1, text2 = dataset["text1"], dataset["text2"]
+    real_text_id = np.ones(len(text1)) * 3 - np.array(dataset["real_text_id"])
+    dataset_swap = Dataset.from_dict({
+        "text1": text2,
+        "text2": text1,
+        "real_text_id": real_text_id.astype(int),
+    })
+    return concatenate_datasets([dataset, dataset_swap], axis=0)
 
 
 def _extract_mean_pooling_vector(  # noqa: PLR0913
@@ -146,10 +170,11 @@ def extract_features(  # noqa: PLR0913
 
     Returns:
         features (np.ndarray): Features extracted from the text pairs.
-        ids (list[int]): List of sample IDs.
+        df_ids (pd.DataFrame): DataFrame containing the IDs and real_text_ids (if available).
     """
     features = []
     ids = []
+    real_text_ids = []
 
     for row in tqdm(dataset, desc="Extracting features"):
         vec1 = _extract_mean_pooling_vector(
@@ -167,26 +192,33 @@ def extract_features(  # noqa: PLR0913
         final_vec = torch.cat([vec1, vec2, diff, prod])
         features.append(final_vec.numpy())
         ids.append(row["id"])
+        if "real_text_id" in row:
+            real_text_ids.append(row["real_text_id"])
 
-    return np.array(features), ids
+    if len(real_text_ids) > 0:
+        df_ids = pd.DataFrame({"id": ids, "real_text_id": real_text_ids})
+    else:
+        logger.warning("The real_text_id column is not present in the dataset.")
+        df_ids = pd.DataFrame({"id": ids})
+    return np.array(features), df_ids
 
 
 def convert_features_to_dataframe(
-    dataset_features: np.ndarray, ids: list[int]
+    dataset_features: np.ndarray, df_ids: pd.DataFrame
 ) -> pd.DataFrame:
     """
     Convert the features extracted from the texts to a pandas DataFrame.
 
     Args:
         dataset_features (np.array): The features extracted from the text using the huggingface model.
-        ids (list[int]): List of the IDs.
+        df_ids (pd.DataFrame): DataFrame containing the IDs and real_text_ids (if available).
 
     Returns:
         (pd.DataFrame): A DataFrame containing the features with columns for each feature and the ids.
     """
     return pd.concat(
         [
-            pd.DataFrame({"id": ids}),
+            df_ids,
             pd.DataFrame(
                 dataset_features,
                 columns=[f"token_feat_{i}" for i in range(dataset_features.shape[1])],
