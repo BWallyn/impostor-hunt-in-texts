@@ -9,8 +9,11 @@ model_training.experiment_folder_path: "./mlflow_experiments/"
 model_training.experiment_name: "impostor_hunt_in_texts"
 model_training.experiment_id_saved: "247466202237108334"
 
+# Columns not to use in the model training
+model_training.id_to_drop: ${globals:id_to_drop}
+
 # Parameters to split data
-model_training.label_column: "id"
+model_training.label_column: "real_text_id"
 
 # Parameters for the pipeline
 model_training.pca_n_components: 20

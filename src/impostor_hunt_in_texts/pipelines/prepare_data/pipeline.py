@@ -27,7 +27,10 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             Node(
                 func=create_dataset_train,
-                inputs=["df_train", "params:path_data_train"],
+                inputs={
+                    "df": "df_train",
+                    "path_data": "params:path_data_train"
+                },
                 outputs="dataset_train",
                 name="Create_dataset_train",
             ),
@@ -39,7 +42,10 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             Node(
                 func=create_datasets_dict,
-                inputs=["dataset_train", "dataset_test"],
+                inputs={
+                    "dataset_train": "dataset_train",
+                    "dataset_test": "dataset_test",
+                },
                 outputs="dataset_dict",
                 name="Create_datasets_dict",
             ),
