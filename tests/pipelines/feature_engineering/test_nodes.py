@@ -222,13 +222,13 @@ def test_extract_features_basic():
         assert len(features) == 2
         assert len(ids) == 2
         # assert ids == [1, 2]
-        assert features.shape == (2, 40)  # 4 * 10 (vec1, vec2, diff, prod)
+        assert features.shape == (2, 50)  # 5 * 10 (vec1, vec2, diff, prod, ratio)
         mock_extract.assert_called_with(
             mock_dataset[1]["text2"], tokenizer, model, 512, 256, "cpu"
         )
 
         # Check feature construction
-        expected_vec = torch.cat([mock_vec1, mock_vec2, mock_vec1 - mock_vec2, mock_vec1 * mock_vec2])
+        expected_vec = torch.cat([mock_vec1, mock_vec2, mock_vec1 - mock_vec2, mock_vec1 * mock_vec2, mock_vec1 / (mock_vec2 + 1e-6)])
         assert torch.allclose(torch.tensor(features[0]), expected_vec, atol=1e-6)
 
 def test_extract_features_empty_dataset():

@@ -7,12 +7,18 @@ generated using Kedro 1.0.0
 # =================
 
 import logging
+import re
+import unicodedata
+from typing import Optional
 
 import numpy as np
 import pandas as pd
 import torch
 import transformers
 from datasets import Dataset, concatenate_datasets
+from nltk.tokenize import sent_tokenize, word_tokenize
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 
 from impostor_hunt_in_texts.pipelines.feature_engineering.validate_params import (
@@ -183,9 +189,12 @@ def extract_features(  # noqa: PLR0913
         # Compute interaction vectors
         diff = vec1 - vec2
         prod = vec1 * vec2
+        ratio = vec1 / (vec2 + 1e-6)
+        # cos_similarity = cosine_similarity(vec1.reshape(1, -1), vec2.reshape(1, -1))[0][0]
+        # eucl_distance = np.linalg.norm(vec1 - vec2)
 
         # Concatenate all parts
-        final_vec = torch.cat([vec1, vec2, diff, prod])
+        final_vec = torch.cat([vec1, vec2, diff, prod, ratio])
         features.append(final_vec.numpy())
         ids.append(row["id"])
         if "real_text_id" in row:
@@ -222,3 +231,70 @@ def convert_features_to_dataframe(
         ],
         axis=1,
     )
+
+
+def _extract_text_info(text: str):
+    """Extract information from the text.
+
+    Args:
+        text (str): The text from which info is extracted.
+
+    Returns:
+        features (dict): A dictionary containing the extracted features.
+    """
+    text = re.sub(r"\s+", " ", text).strip()
+    words = word_tokenize(text)
+    sentences = sent_tokenize(text)
+    features = {
+        "char_count": len(text),
+        "word_count": len(words),
+        "sentence_count": len(sentences),
+        "avg_word_length": np.mean([len(word) for word in words]),
+    }
+    non_space_chars = list(re.findall(r"\S", text))
+    if non_space_chars:
+        latin_chars = [c for c in non_space_chars if 'LATIN' in unicodedata.name(c, '')]
+        features["latin_ratio"] = len(latin_chars) / len(non_space_chars)
+    else:
+        features["latin_ratio"] = 0.0
+    return features
+
+
+def create_differential_features(df: pd.DataFrame, model_to_load: Optional[str] = None) -> pd.DataFrame:
+    """Create differential features between text 1 and text 2.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame containing 'text1' and 'text2' columns.
+        model_to_load (str): The model to load and to use for embedding and similarity calculation.
+
+    Returns:
+        df (pd.DataFrame): The DataFrame with new differential features added.
+    """
+    # Load the model if specified
+    try:
+        sbert_model = SentenceTransformer('all-MiniLM-L6-v2')
+    except Exception as e:
+        logger.warning(f"Could not load SentenceTransformer model: {e}")
+        sbert_model = None
+    features_1 = df['text1'].apply(_extract_text_info).apply(pd.Series)
+    features_2 = df['text2'].apply(_extract_text_info).apply(pd.Series)
+    features_cols = list(features_1.columns)
+    for col in tqdm(features_cols, desc="Creating differential features"):
+        df[f"{col}_diff"] = features_1[col] - features_2[col]
+        df[f"{col}_ratio"] = features_1[col] / (features_2[col] + 1e-6)
+    if sbert_model is not None:
+        logger.info("Calculating SBERT embeddings and cosine similarity.")
+        embeddings_1 = sbert_model.encode(df["text1"].tolist(), show_progress_bar=True, batch_size=16)
+        embeddings_2 = sbert_model.encode(df["text2"].tolist(), show_progress_bar=True, batch_size=16)
+        df["cosine_similarity"] = [cosine_similarity([e1], [e2])[0][0] for e1, e2 in zip(embeddings_1, embeddings_2)]
+        df["euclidean_distance"] = [np.linalg.norm(e1 - e2) for e1, e2 in zip(embeddings_1, embeddings_2)]
+    final_features_cols = [
+        f"{col}_diff" for col in features_cols
+    ] + [
+        f"{col}_ratio" for col in features_cols
+    ]
+    if "cosine_similarity" in df.columns:
+        final_features_cols.extend(["cosine_similarity", "euclidean_distance"])
+    for col in final_features_cols:
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0, 0).replace([np.inf, -np.inf], 0)
+    return df

@@ -11,3 +11,6 @@ feature_engineering.hf_model_name: "bert-base-uncased"
 feature_engineering.max_length: 512
 feature_engineering.stride: 256
 feature_engineering.device: "cpu"
+
+# Define the Sentence-BERT model to be used for embedding and similarity calculations
+feature_engineering.sbert_model: "all-MiniLM-L6-v2"
