@@ -228,7 +228,7 @@ def test_extract_features_basic():
         )
 
         # Check feature construction
-        expected_vec = torch.cat([mock_vec1, mock_vec2, mock_vec1 - mock_vec2, mock_vec1 * mock_vec2])
+        expected_vec = torch.cat([mock_vec1, mock_vec2, mock_vec1 - mock_vec2, mock_vec1 * mock_vec2, mock_vec1 / (mock_vec2 + 1e-6)])
         assert torch.allclose(torch.tensor(features[0]), expected_vec, atol=1e-6)
 
 def test_extract_features_empty_dataset():
