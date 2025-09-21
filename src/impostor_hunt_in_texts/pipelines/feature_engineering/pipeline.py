@@ -8,6 +8,7 @@ from kedro.pipeline import Node, Pipeline
 from impostor_hunt_in_texts.pipelines.feature_engineering.nodes import (
     augment_data,
     convert_features_to_dataframe,
+    # create_differential_features,
     extract_features,
     load_model_and_tokenizer,
     validate_input_params,
@@ -98,6 +99,24 @@ def create_pipeline(**kwargs) -> Pipeline:
                 outputs="df_test_features",
                 name="Convert_features_to_dataframe_test",
             ),
+            # Node(
+            #     func=create_differential_features,
+            #     inputs={
+            #         "df": "df_train_pandas",
+            #         "model_to_load": "params:sbert_model",
+            #     },
+            #     outputs="df_train_features",
+            #     name="Create_differential_features_train",
+            # ),
+            # Node(
+            #     func=create_differential_features,
+            #     inputs={
+            #         "df": "df_test_pandas",
+            #         "model_to_load": "params:sbert_model",
+            #     },
+            #     outputs="df_test_features",
+            #     name="Create_differential_features_test",
+            # ),
         ],
         namespace="feature_engineering",
         inputs="dict_metadata_datasets",
