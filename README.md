@@ -10,6 +10,23 @@ The main task of this competition is to detect fake texts in a given dataset. Ea
 
 All this project is designed using Kedro. You can find the architecture of the project here: https://bwallyn.github.io/impostor-hunt-in-texts/
 
+### Prepare data
+
+The prepare data pipeline creates the training and test datasets and convert them into a Hugging Face Dataset Dict.
+
+### Feature engineering
+
+The feature engineering pipeline performs augmentation data, creates new features by extracting text info using a NLP model and reconverts it to a dataframe.
+
+### Train model
+
+The train model pipeline conducts the training of a Gradient Boosting model. To do so, it:
+- Creates a MLflow experiment or get one if given by the user.
+- Initialize the model parameters and create a pydantic object to store them.
+- Drop some columns.
+- Find the best hyperparameters using bayesian optimization.
+- Train a final model using the best hyperparams found previously.
+
 
 ## Kedro
 
