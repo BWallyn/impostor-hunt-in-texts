@@ -28,6 +28,16 @@ The train model pipeline conducts the training of a Gradient Boosting model. To 
 - Train a final model using the best hyperparams found previously.
 
 
+## Set up and contribute
+
+### Set up your environment
+
+To develop on this project, the first part is to set your environment. To do so:
+- Create a python virtual environment (if you are using Visual Studio Code, ctrl+shift+p). Don't install the dependencies yet.
+- Install `uv` using ```pip install uv```.
+- Install the dependencies using ```uv sync --all-extras``` (the --all-extras option installs the dev dependencies).
+Now you are all set to contribute to the project.
+
 ## Kedro
 
 ### Overview
