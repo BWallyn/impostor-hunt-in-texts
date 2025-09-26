@@ -28,6 +28,38 @@ The train model pipeline conducts the training of a Gradient Boosting model. To 
 - Train a final model using the best hyperparams found previously.
 
 
+## Set up and contribute
+
+### Set up your environment
+
+To develop on this project, the first part is to set your environment. To do so:
+- Create a python virtual environment (if you are using Visual Studio Code, ctrl+shift+p). Don't install the dependencies yet.
+- Install `uv` using ```pip install uv```.
+- Install the dependencies using ```uv sync --all-extras``` (the --all-extras option installs the dev dependencies).
+Now you are all set to contribute to the project.
+
+### Git and branches
+
+We defined some branch policies to protect and contribute in the right way. In a typical Git flow, the following branches are commonly used:
+- **`main`**: The main branch contains the production-ready code.
+- **`dev`**: The dev branch contains the latest development changes.
+- **`feature/*`**: Feature branches are used to develop new features.
+- **`release_*`**: Release branches are used to prepare for a new production release.
+- **`hotfix_*`**: Hotfix branches are used to quickly fix production issues.
+
+<img src="_assets/git_low_branching.svg" alt="git flow branching strategy" width="600">
+
+### How to contribute
+
+- Create a new branch using the following guidelines:
+  - `feature/<branch-name>` to add a feature to the project.
+  - `fix/<branch-name>` to fix a bug in the project.
+- Code.
+- Add unit tests.
+- Create a pull request to the `dev` branch.
+- Merge and if it validated create a pull request to the `main` branch.
+
+
 ## Kedro
 
 ### Overview
